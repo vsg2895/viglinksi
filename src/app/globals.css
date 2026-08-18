@@ -1,0 +1,94 @@
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+/* Viglinksi — dark plum editorial theme: deep aubergine ground, gold accent,
+   lilac secondary. Fonts: Manrope (sans/body) + Instrument Serif (display).
+   Palette lifted from the Viglinksi design in sites/Viglinksi.html. */
+:root {
+  --background: #17111f;
+  --foreground: #f4efe7;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  /* Brand palette (generates real utilities: bg-brand, text-ink, border-line…).
+     Same token NAMES as the sibling sites, so every shared component works
+     unchanged — only the values differ. */
+  /* `cream` is the BASE page surface, `paper` the raised panel above it. On this
+     dark theme both are plum — the names are kept so every component shared with
+     the sibling sites keeps working, but a light value here would collide with
+     `ink` (also light) and render text invisible on its own background. */
+  --color-cream: #17111f;
+  --color-paper: #1e1729;
+  --color-ink: #f4efe7;
+  --color-ink-soft: #e9e2f0;
+  --color-muted: #b6a9c4;
+  --color-faint: #8f8299;
+  --color-brand: #e6c37e;
+  --color-brand-dark: #d9b268;
+  --color-brand-soft: #f3dcae;
+  --color-line: #2a2136;
+  --color-line-soft: #352a44;
+  --color-gold: #e6c37e;
+  --color-win: #7fd6a6;
+  --color-win-bg: #1b2f26;
+
+  /* Lilac secondary, used for links and highlights against the plum ground. */
+  --color-accent: #b072e8;
+  --color-accent-soft: #c99af0;
+
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-instrument-serif);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-manrope), Arial, Helvetica, sans-serif;
+}
+
+.font-display {
+  font-family: var(--font-instrument-serif), Georgia, serif;
+}
+
+/* Warm radial wash used behind the hero. */
+.hero-wash {
+  background: radial-gradient(900px 420px at 50% -80px, #241a33, #17111f 75%);
+}
+
+/* ── Responsive safety net (all phones / tablets / laptops / large screens) ── */
+html {
+  -webkit-text-size-adjust: 100%; /* no iOS text auto-inflation on rotate */
+}
+body {
+  overflow-x: clip; /* never scroll the page sideways; safe with the sticky header */
+}
+
+/* Hide the scrollbar on horizontally-scrollable rows (e.g. the mobile nav). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Scraped HTML content (casino / offer descriptions) must stay in its column
+   on small screens: wrap long words, cap media width, scroll wide tables. */
+.prose {
+  overflow-wrap: break-word;
+}
+.prose :where(img, video, iframe) {
+  max-width: 100%;
+  height: auto;
+}
+.prose :where(table) {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+}
+.prose :where(pre) {
+  overflow-x: auto;
+}
