@@ -27,7 +27,7 @@ export default function AppleIcon() {
           fontFamily: 'sans-serif',
         }}
       >
-        R
+        V
       </div>
     ),
     size,
