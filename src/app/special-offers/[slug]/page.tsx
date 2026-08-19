@@ -6,9 +6,9 @@ import { getSpecialOffers, getSpecialOffer } from '@/lib/api'
 import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
 import { COPY } from '@/constants/copy'
+import { SITE_URL } from '@/lib/config'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -102,7 +102,7 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
           )}
 
           {offer.description && (
-            <div className="prose prose-zinc mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: offer.description }} />
+            <div className="prose prose-invert mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: offer.description }} />
           )}
 
           {offer.casino && (

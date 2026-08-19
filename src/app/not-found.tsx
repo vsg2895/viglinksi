@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { hasSpecialOffers } from '@/lib/api'
+import { COPY } from '@/constants/copy'
 
 /**
  * Branded 404.
@@ -16,31 +18,32 @@ export const metadata: Metadata = {
 
 const LINKS = [
   { href: '/', label: 'Home' },
-  { href: '/casinos', label: 'Casinos' },
-  { href: '/categories', label: 'Categories' },
-  { href: '/special-offers', label: 'Special Offers' },
+  { href: '/casinos', label: COPY.nav.casinos },
+  { href: '/categories', label: COPY.nav.categories },
+  { href: '/special-offers', label: COPY.nav.specialOffers },
 ]
 
-export default function NotFound() {
+export default async function NotFound() {
+  // Same rule as the header nav: a link to an empty offers page is a worse dead
+  // end than no link, and this page exists precisely to recover a dead end.
+  const showSpecialOffers = await hasSpecialOffers()
+  const links = LINKS.filter(({ href }) => href !== '/special-offers' || showSpecialOffers)
+
   return (
     <main className="px-4 py-24">
       <div className="container mx-auto max-w-2xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: '#e6c37e' }}>
-          404
-        </p>
-        <h1 className="mt-4 text-3xl font-bold text-slate-900 sm:text-4xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand">404</p>
+        <h1 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-4xl">
           We couldn&rsquo;t find that page
         </h1>
-        <p className="mt-4 text-slate-500">
-          The page may have moved or no longer exists. Try one of these instead:
-        </p>
+        <p className="mt-4 text-muted">{COPY.errors.notFound} Try one of these instead:</p>
         <nav aria-label="Helpful links" className="mt-8">
           <ul className="flex flex-wrap justify-center gap-3" role="list">
-            {LINKS.map(({ href, label }) => (
+            {links.map(({ href, label }) => (
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex rounded-full border border-slate-300 bg-white/70 px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-slate-400"
+                  className="inline-flex rounded-full border border-line-soft bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
                 >
                   {label}
                 </Link>

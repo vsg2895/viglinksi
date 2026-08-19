@@ -7,7 +7,7 @@ import CookieConsent from '@/components/CookieConsent'
 import ToastProvider from '@/components/ToastProvider'
 import CookieSettingsButton from '@/components/CookieSettingsButton'
 import Logo from '@/components/Logo'
-import { getSocialLinks } from '@/lib/api'
+import { getSocialLinks, hasSpecialOffers } from '@/lib/api'
 import { buildOrganizationSchema, buildWebSiteSchema, jsonLdScript } from '@/lib/seo'
 import { SITE_URL } from '@/lib/config'
 import { COPY } from '@/constants/copy'
@@ -23,8 +23,13 @@ const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin']
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? 'Viglinksi'
 
-const SITE_TITLE = `${SITE_NAME} — Audited Casino Reviews & Fair Bonus Terms`
-const SITE_DESCRIPTION = `${SITE_NAME} is your independent guide to the best online casinos — expert reviews, exclusive bonuses and hand-picked special offers.`
+// Both strings live in COPY so this site's wording is defined in exactly one
+// place — the same place the page-level titles and descriptions come from.
+// The previous SITE_DESCRIPTION here was byte-identical to the one shipped by
+// two sibling domains, which made this site's default meta/og/twitter
+// description duplicate content on every page that falls back to it.
+const SITE_TITLE = `${SITE_NAME} — ${COPY.site.titleTail}`
+const SITE_DESCRIPTION = `${SITE_NAME} ${COPY.site.description}`
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL || 'https://viglinksi.com'),
@@ -35,7 +40,10 @@ export const metadata: Metadata = {
   },
   description: SITE_DESCRIPTION,
   applicationName: SITE_NAME,
-  keywords: ['online casino reviews', 'casino bonuses', 'special offers', 'best online casinos', SITE_NAME],
+  // Terms that describe what this site actually publishes. The generic set that
+  // was here ("best online casinos", "casino bonuses") was shared with the
+  // sibling domains and described none of them in particular.
+  keywords: [...COPY.site.keywords, SITE_NAME],
   // Explicit per-site favicon so the browser tab always shows this site's mark.
   // `apple` is deliberately NOT listed: an explicit icons object overrides the
   // file-based convention, and app/apple-icon.tsx generates a real 180x180 PNG.
@@ -124,6 +132,12 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
     socialLinks = []
   }
 
+  // "Special Offers" only earns its slot in the nav when this site actually has
+  // a visible offer to show; with none, the link would lead to an empty page,
+  // so both the header and the footer drop it.
+  const showSpecialOffers = await hasSpecialOffers()
+  const navLinks = NAV_LINKS.filter(({ href }) => href !== '/special-offers' || showSpecialOffers)
+
   // Site-wide structured data, rendered once here so every page carries it.
   // Next.js manages the document <head> (manual <head> tags in a root layout are
   // discouraged), so per the framework's JSON-LD guide the <script> is rendered
@@ -150,7 +164,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
             <Logo />
             <nav aria-label="Main navigation" className="no-scrollbar -mr-4 min-w-0 overflow-x-auto pr-4">
               <ul className="flex items-center gap-0.5 sm:gap-1" role="list">
-                {NAV_LINKS.map(({ href, label }) => (
+                {navLinks.map(({ href, label }) => (
                   <li key={href}>
                     <Link href={href} className="block whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink transition-colors hover:bg-brand/10 hover:text-brand sm:px-4">
                       {label}
@@ -195,7 +209,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <div className="sm:text-right">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-brand">Explore</p>
                 <ul className="flex flex-col gap-2">
-                  {NAV_LINKS.map(({ href, label }) => (
+                  {navLinks.map(({ href, label }) => (
                     <li key={href}>
                       <Link href={href} className="text-sm text-ink-soft transition-colors hover:text-brand">{label}</Link>
                     </li>

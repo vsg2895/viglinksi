@@ -7,12 +7,12 @@ import { FAQ_ITEMS } from '@/constants/faq'
 import CasinoCard from '@/components/CasinoCard'
 import CategoryNav from '@/components/CategoryNav'
 import SpecialOfferCard from '@/components/SpecialOfferCard'
+import { SITE_URL } from '@/lib/config'
 import type { Category } from '@shared/types/category'
 import type { CasinoWithAttachment } from '@shared/types/casino'
 import type { SpecialOffer } from '@shared/types/specialOffer'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 const YEAR = new Date().getFullYear()
 
 type Props = { searchParams: Promise<{ category?: string }> }
@@ -70,15 +70,23 @@ export default async function HomePage({ searchParams }: Props) {
 
   // Organization schema is emitted site-wide from the root layout; the home
   // page only adds its page-specific ItemList of top casinos.
+  //
+  // The list is the SELECTED category, not the whole catalogue, so it is named
+  // and addressed as that category — it previously claimed the generic name
+  // "Top Casinos at <brand>" and pointed at /casinos, describing neither the
+  // rows below it nor a URL that renders them.
   const listSchema = buildItemListSchema(
-    `Top Casinos at ${SITE_NAME}`,
-    `${SITE_URL}/casinos`,
+    activeCategory ? `${activeCategory.name} — ${COPY.home.topCasinosTitle}` : COPY.home.topCasinosTitle,
+    selected ? `${SITE_URL}/categories/${selected}` : `${SITE_URL}/casinos`,
     casinos.map((c, i) => ({ position: i + 1, name: c.name, url: `${SITE_URL}/casinos/${c.slug}` })),
   )
 
   const graph = [
     buildWebPageSchema({
-      name: `Best Online Casinos ${YEAR}`,
+      // Mirrors the actual <title>. The previous "Best Online Casinos <year>"
+      // was generic boilerplate shipped identically by the sibling domains and
+      // matched neither this page's title nor its H1.
+      name: `${COPY.home.homeTitle} ${YEAR}`,
       url: SITE_URL,
       description: COPY.home.metaDescription,
     }),

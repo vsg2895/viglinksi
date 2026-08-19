@@ -17,6 +17,26 @@
  * complaint history rather than commission.
  */
 export const COPY = {
+  // Site-wide identity. These feed the root layout's fallback <title>, the
+  // default meta description, the Organization/WebSite JSON-LD and the default
+  // og:/twitter: description — i.e. every page that does not set its own.
+  //
+  // `description` must stay distinct from `home.metaDescription`: the home page
+  // overrides it, so if the two matched, the site would simply be duplicating
+  // itself across the pages that fall back to this one (the legal pages, the
+  // 404, and any CMS page with no meta description authored in the admin).
+  site: {
+    titleTail: 'Audited Casino Reviews & Fair Bonus Terms',
+    description:
+      'is an independent casino audit desk: we read the terms, test the withdrawals and publish what we find before you sign up.',
+    keywords: [
+      'independent casino audit',
+      'casino payout reliability',
+      'bonus wagering terms explained',
+      'casino complaint history',
+      'casino withdrawal limits',
+    ],
+  },
   nav: {
     casinos: 'Casinos',
     specialOffers: 'Special Offers',

@@ -7,9 +7,9 @@ import { buildCasinoReviewSchema, buildBreadcrumbSchema, buildWebPageSchema, bre
 import { resolveImageUrl } from '@/lib/images'
 import CasinoSpecialOffers from '@/components/CasinoSpecialOffers'
 import { COPY } from '@/constants/copy'
+import { SITE_URL } from '@/lib/config'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -35,15 +35,52 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description = casino.meta_description
       ? `${casino.meta_description} ${COPY.casinos.reviewSignature}`
       : `${casino.name} — ${COPY.casinos.reviewSummary}`
+    // Share cards fell back to the site-wide generated card, so every casino
+    // shared identically. The operator's own banner (or logo) is a truthful,
+    // page-specific image and needs no extra asset.
+    const shareImage = resolveImageUrl(casino.banner_image ?? casino.image_path)
+    const images = shareImage
+      ? [{ url: shareImage, alt: `${casino.name} — reviewed by ${SITE_NAME}` }]
+      : undefined
+
     return {
       title,
       description,
       alternates: { canonical: `${SITE_URL}/casinos/${slug}` },
-      openGraph: { type: 'article', url: `${SITE_URL}/casinos/${slug}`, siteName: SITE_NAME, title, description },
+      openGraph: {
+        type: 'article',
+        url: `${SITE_URL}/casinos/${slug}`,
+        siteName: SITE_NAME,
+        title,
+        description,
+        ...(images ? { images } : {}),
+      },
+      // twitter: was set site-wide but never per review, so X rendered the
+      // generic card for every casino.
+      twitter: {
+        card: 'summary_large_image',
+        title,
+        description,
+        ...(shareImage ? { images: [shareImage] } : {}),
+      },
     }
   } catch {
     return { title: COPY.errors.notFound }
   }
+}
+
+/** Publication date for the "last reviewed" fact — fixed locale/zone so the
+ *  statically rendered string is identical on every build machine. */
+function formatReviewDate(value: string | null | undefined): string | null {
+  if (!value) return null
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return null
+  return new Intl.DateTimeFormat('en-GB', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(d)
 }
 
 export default async function CasinoDetailPage({ params }: Props) {
@@ -59,6 +96,9 @@ export default async function CasinoDetailPage({ params }: Props) {
   const banner = resolveImageUrl(casino.banner_image)
   const logo = resolveImageUrl(casino.image_path)
   const pageUrl = `${SITE_URL}/casinos/${slug}`
+  const categoryNames = (casino.categories ?? []).map((c) => c.name)
+  const liveOffers = (casino.special_offers ?? []).length
+  const reviewDate = formatReviewDate(casino.updated_at)
   const reviewSchema = buildCasinoReviewSchema(casino)
   const breadcrumb = buildBreadcrumbSchema(
     [
@@ -115,8 +155,50 @@ export default async function CasinoDetailPage({ params }: Props) {
             {COPY.casinos.visitCasino}
           </a>
 
+          {/*
+            The facts an answer engine has to dig out of the prose otherwise:
+            the score, where the operator sits in the catalogue, how many offers
+            are live and when the entry was last revised. Every value is read
+            from the record — nothing here is asserted that the page does not
+            already know, and the same figures appear in the Review and WebPage
+            nodes above, so markup and visible text cannot disagree.
+          */}
+          <section className="mt-8 rounded-2xl border border-line bg-paper p-6" aria-labelledby="at-a-glance">
+            <h2 id="at-a-glance" className="font-display text-xl font-semibold text-ink">
+              {casino.name} at a glance
+            </h2>
+            <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">{COPY.casinos.rating}</dt>
+                <dd className="mt-1 text-ink">{casino.rating} out of 5</dd>
+              </div>
+              {liveOffers > 0 && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">Offers listed</dt>
+                  <dd className="mt-1 text-ink">
+                    {liveOffers} {liveOffers === 1 ? 'offer' : 'offers'} on this page
+                  </dd>
+                </div>
+              )}
+              {categoryNames.length > 0 && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">Listed under</dt>
+                  <dd className="mt-1 text-ink">{categoryNames.join(', ')}</dd>
+                </div>
+              )}
+              {reviewDate && (
+                <div>
+                  <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">Entry last revised</dt>
+                  <dd className="mt-1 text-ink">
+                    <time dateTime={casino.updated_at}>{reviewDate}</time>
+                  </dd>
+                </div>
+              )}
+            </dl>
+          </section>
+
           {casino.description && (
-            <div className="prose prose-zinc mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: casino.description }} />
+            <div className="prose prose-invert mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: casino.description }} />
           )}
 
           {casino.categories && casino.categories.length > 0 && (

@@ -6,9 +6,9 @@ import { buildItemListSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcr
 import { COPY } from '@/constants/copy'
 import CasinoCard from '@/components/CasinoCard'
 import Pagination from '@/components/Pagination'
+import { SITE_URL } from '@/lib/config'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 type Props = {
   params: Promise<{ slug: string }>
@@ -84,7 +84,11 @@ export default async function CategoryDetailPage({ params, searchParams }: Props
     buildWebPageSchema({
       name: `${category.name} Casinos`,
       url: pageUrl,
-      description: `Best ${category.name} casinos reviewed by ${SITE_NAME}.`,
+      // The same sentence generateMetadata puts in the meta description. The
+      // formulaic "Best <name> casinos reviewed by <brand>." that was here
+      // survived from the template: it contradicted the description actually
+      // served in the <head>, and read identically on every sibling domain.
+      description: `${category.name} casinos — ${COPY.categories.categoryMetaSuffix}`,
       breadcrumbId: breadcrumbIdFor(pageUrl),
     }),
     breadcrumb,

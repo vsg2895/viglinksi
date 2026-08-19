@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import { getPage } from '@/lib/api'
 import { LEGAL_PAGES } from '@/constants/legalPages'
 import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
+import { SITE_URL } from '@/lib/config'
 
 // The known legal slugs are pre-rendered; any OTHER published CMS page renders
 // on demand (and unknown/unpublished slugs 404 via notFound()). Static segments
@@ -11,7 +12,6 @@ import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScrip
 export const dynamicParams = true
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -82,7 +82,7 @@ export default async function LegalPage({ params }: Props) {
           <h1 className="text-3xl font-bold text-ink">{page.title}</h1>
 
           <article
-            className="prose prose-zinc mt-8 max-w-none prose-headings:font-bold prose-a:text-brand"
+            className="prose prose-invert mt-8 max-w-none prose-headings:font-bold prose-a:text-brand"
             dangerouslySetInnerHTML={{ __html: page.content }}
           />
         </div>

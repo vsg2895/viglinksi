@@ -1,14 +1,20 @@
 import type { Metadata } from 'next'
 import { getCategories, getCategory } from '@/lib/api'
-import { buildItemListSchema, buildWebPageSchema, jsonLdScript } from '@/lib/seo'
+import {
+  buildBreadcrumbSchema,
+  buildItemListSchema,
+  buildWebPageSchema,
+  breadcrumbIdFor,
+  jsonLdScript,
+} from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import CasinoCard from '@/components/CasinoCard'
 import CategoryNav from '@/components/CategoryNav'
 import Pagination from '@/components/Pagination'
+import { SITE_URL } from '@/lib/config'
 import type { Category } from '@shared/types/category'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? ''
 
 type Props = { searchParams: Promise<{ category?: string; page?: string }> }
 
@@ -86,12 +92,25 @@ export default async function CasinosPage({ searchParams }: Props) {
     casinos.map((c, i) => ({ position: (meta.current_page - 1) * meta.per_page + i + 1, name: c.name, url: `${SITE_URL}/casinos/${c.slug}` })),
   )
 
+  const pageUrl = canonicalFor(selected, page)
   const graph = [
     buildWebPageSchema({
       name: COPY.casinos.pageTitle,
-      url: canonicalFor(selected, page),
+      url: pageUrl,
       description: COPY.casinos.pageDescription,
+      breadcrumbId: breadcrumbIdFor(pageUrl),
     }),
+    // The trail follows the canonical path (Home → Categories → this category),
+    // not the /casinos URL the visitor may have typed — that one redirects, and
+    // a breadcrumb pointing through a redirect wastes the signal.
+    buildBreadcrumbSchema(
+      [
+        { name: 'Home', url: SITE_URL },
+        { name: COPY.nav.categories, url: `${SITE_URL}/categories` },
+        { name: category.name, url: `${SITE_URL}${basePath}` },
+      ],
+      pageUrl,
+    ),
     listSchema,
   ]
 

@@ -9,11 +9,15 @@ import type {
 import type { CasinoWithAttachment } from '@shared/types/casino'
 import type { SocialLink } from '@shared/types/socialLink'
 import { SITE_URL } from './config'
+import { COPY } from '@/constants/copy'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
+// Sourced from COPY, which is also what the root layout puts in the meta
+// description — so the Organization/WebSite nodes describe the site in the
+// same words a crawler reads in the <head>, rather than a second, divergent
+// description maintained separately here.
 const SITE_DESCRIPTION =
-  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ??
-  `${SITE_NAME} audits online casinos on payout reliability, bonus fairness and complaint history — never on commission.`
+  process.env.NEXT_PUBLIC_SITE_DESCRIPTION ?? `${SITE_NAME} ${COPY.site.description}`
 
 /**
  * Stable @id for the publisher node.

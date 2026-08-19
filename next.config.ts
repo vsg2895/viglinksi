@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   // Pin the file-tracing root to THIS folder. Otherwise the parent monorepo
   // lockfile makes Next infer casino-platform/ as the root and nest the output
-  // at .next/standalone/sites/idevaffiliation/server.js (breaking the Docker
+  // at .next/standalone/sites/<this-site>/server.js (breaking the Docker
   // `node server.js` path) and emit the "inferred workspace root" warning.
   outputFileTracingRoot: projectRoot,
   images: {
