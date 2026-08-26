@@ -108,6 +108,11 @@ export const COPY = {
     // Short brand blurb in the footer, above the legal links.
     tagline:
       'An independent casino audit desk. We read the terms, test the payouts and publish what we find — 18+.',
+    // Registered postal address, shown beside the copyright line. A physical
+    // address in the footer is what mailbox providers and the gambling
+    // affiliate compliance checks both look for, and it must match the address
+    // used in the email templates.
+    postalAddress: '44 Metochiou Street, Nicosia 1101, Cyprus',
     disclaimer:
       'Gambling carries real financial risk and is for adults aged 18 and over only. Treat it as entertainment, never as income, and stop when it stops being fun. Some links here earn us a commission; it plays no part in whether a casino passes the audit.',
   },
