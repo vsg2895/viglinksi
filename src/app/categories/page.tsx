@@ -17,8 +17,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: COPY.categories.pageTitle,
     description: COPY.categories.pageDescription,
-    alternates: { canonical: `${SITE_URL}/categories` },
-    openGraph: { type: 'website', url: `${SITE_URL}/categories`, siteName: SITE_NAME, title: COPY.categories.pageTitle, description: COPY.categories.pageDescription },
+    alternates: { canonical: `/categories` },
+    openGraph: { type: 'website', url: `/categories`, siteName: SITE_NAME, title: COPY.categories.pageTitle, description: COPY.categories.pageDescription },
   }
 }
 

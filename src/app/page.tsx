@@ -32,8 +32,8 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
-    alternates: { canonical: SITE_URL },
-    openGraph: { type: 'website', url: SITE_URL, siteName: SITE_NAME, title, description },
+    alternates: { canonical: '/' },
+    openGraph: { type: 'website', url: '/', siteName: SITE_NAME, title, description },
     twitter: { card: 'summary_large_image', title, description },
   }
 }

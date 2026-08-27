@@ -38,8 +38,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: { absolute: title },
     description: page.meta_description ?? undefined,
-    alternates: { canonical: `${SITE_URL}/${slug}` },
-    openGraph: { type: 'article', url: `${SITE_URL}/${slug}`, siteName: SITE_NAME, title: headline, description: page.meta_description ?? undefined },
+    alternates: { canonical: `/${slug}` },
+    openGraph: { type: 'article', url: `/${slug}`, siteName: SITE_NAME, title: headline, description: page.meta_description ?? undefined },
     robots: { index: true, follow: true },
   }
 }
