@@ -182,7 +182,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <ul className="flex items-center gap-0.5 sm:gap-1" role="list">
                 {navLinks.map(({ href, label }) => (
                   <li key={href}>
-                    <Link href={href} className="block whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink transition-colors hover:bg-brand/10 hover:text-brand sm:px-4">
+                    <Link href={href} className="flex min-h-11 items-center whitespace-nowrap rounded-full px-3 py-2 text-sm font-semibold text-ink transition-colors hover:bg-brand/10 hover:text-brand sm:px-4">
                       {label}
                     </Link>
                   </li>
@@ -227,7 +227,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 <ul className="flex flex-col gap-2">
                   {navLinks.map(({ href, label }) => (
                     <li key={href}>
-                      <Link href={href} className="text-sm text-ink-soft transition-colors hover:text-brand">{label}</Link>
+                      <Link href={href} className="inline-block py-1.5 -my-1.5 text-sm text-ink-soft transition-colors hover:text-brand">{label}</Link>
                     </li>
                   ))}
                 </ul>
@@ -238,7 +238,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <ul className="flex flex-wrap gap-x-5 gap-y-2">
                 {LEGAL_PAGES.map(({ slug, label }) => (
                   <li key={slug}>
-                    <Link href={`/${slug}`} className="text-xs text-faint transition-colors hover:text-brand">{label}</Link>
+                    <Link href={`/${slug}`} className="inline-block py-1.5 -my-1.5 text-xs text-faint transition-colors hover:text-brand">{label}</Link>
                   </li>
                 ))}
                 <li>

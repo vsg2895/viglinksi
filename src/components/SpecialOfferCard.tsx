@@ -19,9 +19,9 @@ export default function SpecialOfferCard({ offer }: { offer: SpecialOffer }) {
         {offer.bonuses && <p className="inline-block rounded-lg bg-win-bg px-3 py-1.5 text-sm font-bold text-win">{offer.bonuses}</p>}
         <span className="text-gold" aria-label={`${offer.rating} out of 5`}>{'★'.repeat(offer.rating)}<span className="text-line-soft">{'★'.repeat(5 - offer.rating)}</span></span>
         <div className="mt-auto flex gap-2.5 pt-2">
-          <Link href={`/special-offers/${offer.slug}`} className="flex-1 rounded-xl border border-line-soft bg-paper px-3 py-2.5 text-center text-sm font-bold text-ink transition-colors hover:border-brand hover:text-brand">Details</Link>
+          <Link href={`/special-offers/${offer.slug}`} className="flex min-h-11 flex-1 items-center justify-center rounded-xl border border-line-soft bg-paper px-3 py-2.5 text-center text-sm font-bold text-ink transition-colors hover:border-brand hover:text-brand">Details</Link>
           {offer.affiliate_url && (
-            <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="flex-1 rounded-xl bg-gradient-to-b from-brand-soft to-brand-dark px-3 py-2.5 text-center text-sm font-bold text-black shadow-md shadow-brand/25 transition-transform hover:-translate-y-0.5">Claim</a>
+            <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="flex min-h-11 flex-1 items-center justify-center rounded-xl bg-gradient-to-b from-brand-soft to-brand-dark px-3 py-2.5 text-center text-sm font-bold text-black shadow-md shadow-brand/25 transition-transform hover:-translate-y-0.5">Claim</a>
           )}
         </div>
       </div>
