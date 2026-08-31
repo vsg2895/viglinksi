@@ -26,7 +26,7 @@ export const COPY = {
   // itself across the pages that fall back to this one (the legal pages, the
   // 404, and any CMS page with no meta description authored in the admin).
   site: {
-    titleTail: 'Audited Casino Reviews & Fair Bonus Terms',
+    titleTail: 'Casino Audits, Payout Records & Bonus Terms',
     description:
       'is an independent casino audit desk: we read the terms, test the withdrawals and publish what we find before you sign up.',
     keywords: [
@@ -43,7 +43,7 @@ export const COPY = {
     categories: 'Categories',
   },
   home: {
-    heroEyebrow: 'Audited Casino Reviews',
+    heroEyebrow: 'The Audit Desk',
     // Split in two so the JSX keeps its emphasised <em> while the words change.
     heroHeadline: 'Casino reviews that read',
     heroHighlight: 'the terms before you do',
@@ -55,13 +55,13 @@ export const COPY = {
     specialOffers: 'Fair-Wagering Offers',
     viewAll: 'View All',
     // Leads the home <title>; the year and brand are appended in page.tsx.
-    homeTitle: 'Audited Casino Reviews',
-    faqTitle: 'Questions players actually ask',
+    homeTitle: 'Casino Audits: Payouts & Terms',
+    faqTitle: 'What players ask us before signing up',
     metaDescription:
       'Online casinos audited on payout reliability, bonus fairness and complaint history — never ranked by commission.',
   },
   casinos: {
-    pageTitle: 'Audited Casino Reviews',
+    pageTitle: 'Every Casino We Have Audited',
     pageDescription:
       'Casino reviews that start with the terms and conditions — payout reliability, bonus fairness and complaint history, documented.',
     // Meta-description fallback for a casino review page. Casino records are
@@ -70,12 +70,22 @@ export const COPY = {
     // Short per-site tail appended to an ADMIN-ENTERED casino meta description.
     // Casino records are shared by every site, so without this the same
     // description would ship on all four domains the moment the field is filled.
+    // Appended to og:title / twitter:title on a casino review. The casino's
+    // own meta_title is shared master data, so without this every domain
+    // shipped an IDENTICAL share-card title for the same casino.
+    // H2 over the offers block on a casino page. The literal 'Special Offers'
+    // was hardcoded in the component on all six sites — an identical H2 on
+    // every review page in the network.
+    offersHeading: 'Audited Offers',
+    // Tail of the summary H2: `{casino.name} at a glance`.
+    glanceHeadingTail: 'at a glance',
+    reviewTitleTail: 'Terms & Payouts Audited',
     reviewSignature: 'Audited before it was listed.',
     reviewSummary: 'audited on payout reliability, bonus fairness and complaint history.',
     visitCasino: 'Open Casino',
     readReview: 'Read the Audit',
     rating: 'Audit Score',
-    noResults: 'No casinos match this filter yet.',
+    noResults: 'No audited casino fits those filters yet.',
   },
   specialOffers: {
     pageTitle: 'Offers With Wagering We Would Accept',
@@ -85,7 +95,7 @@ export const COPY = {
     // an identical meta description for the same offer.
     offerMetaSuffix: 'Audited for wagering fairness, with the game weighting stated before you claim.',
     claim: 'Claim Offer',
-    noResults: 'No offers clear our wagering bar right now.',
+    noResults: 'No offer has passed the audit at the moment.',
   },
   categories: {
     pageTitle: 'Audited by Category',
@@ -94,15 +104,15 @@ export const COPY = {
     // Meta-description tail for a single category page. Category records are
     // shared master data, so this is what keeps the four sites distinct there.
     categoryMetaSuffix: 'audited on payout reliability, bonus fairness and complaint history before listing.',
-    noResults: 'Nothing listed under this category yet.',
+    noResults: 'Nothing audited in this category yet.',
   },
   newsletter: {
     title: 'Delistings, in your inbox',
     subtitle: 'We email when a casino is removed from the list — and when one earns a place on it.',
-    placeholder: 'Enter your email',
+    placeholder: 'Email for audit updates',
     button: 'Subscribe',
-    success: 'Almost done — check your inbox and confirm your address to finish subscribing.',
-    error: 'That did not go through. Please try again.',
+    success: 'One step left — confirm the link in your inbox to start receiving audit updates.',
+    error: 'That did not register. Please try again in a moment.',
   },
   footer: {
     // Short brand blurb in the footer, above the legal links.
@@ -125,7 +135,7 @@ export const COPY = {
       'Gambling carries real financial risk and is for adults aged 18 and over only. Treat it as entertainment, never as income, and stop when it stops being fun. Some links here earn us a commission; it plays no part in whether a casino passes the audit.',
   },
   errors: {
-    notFound: 'We could not find that page.',
-    apiError: 'Could not load this content. Please try again shortly.',
+    notFound: 'No page at this address. It may have been retired after a re-audit.',
+    apiError: 'This section did not load. Please refresh in a moment.',
   },
 } as const

@@ -35,6 +35,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description = casino.meta_description
       ? `${casino.meta_description} ${COPY.casinos.reviewSignature}`
       : `${casino.name} — ${COPY.casinos.reviewSummary}`
+    // The `title` above is the casino's own meta_title — shared master data, so
+    // it is byte-identical on every domain in the network. The share card is
+    // where that was most visible: six results, one headline. This site's tail
+    // makes the card its own without touching the shared record.
+    const shareTitle = `${title} — ${COPY.casinos.reviewTitleTail}`
     // Share cards fell back to the site-wide generated card, so every casino
     // shared identically. The operator's own banner (or logo) is a truthful,
     // page-specific image and needs no extra asset.
@@ -51,7 +56,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         type: 'article',
         url: `${SITE_URL}/casinos/${slug}`,
         siteName: SITE_NAME,
-        title,
+        title: shareTitle,
         description,
         ...(images ? { images } : {}),
       },
@@ -59,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       // generic card for every casino.
       twitter: {
         card: 'summary_large_image',
-        title,
+        title: shareTitle,
         description,
         ...(shareImage ? { images: [shareImage] } : {}),
       },
@@ -115,7 +120,12 @@ export default async function CasinoDetailPage({ params }: Props) {
     buildWebPageSchema({
       name: `${casino.name} Review`,
       url: pageUrl,
-      description: casino.meta_description ?? undefined,
+      // Same composition as the <meta> description in generateMetadata. Passing
+      // the raw shared `meta_description` here put an identical WebPage
+      // description on all six domains for the same casino.
+      description: casino.meta_description
+        ? `${casino.meta_description} ${COPY.casinos.reviewSignature}`
+        : `${casino.name} — ${COPY.casinos.reviewSummary}`,
       breadcrumbId: breadcrumbIdFor(pageUrl),
       dateModified: casino.updated_at,
     }),
@@ -165,7 +175,7 @@ export default async function CasinoDetailPage({ params }: Props) {
           */}
           <section className="mt-8 rounded-2xl border border-line bg-paper p-6" aria-labelledby="at-a-glance">
             <h2 id="at-a-glance" className="font-display text-xl font-semibold text-ink">
-              {casino.name} at a glance
+              {casino.name} {COPY.casinos.glanceHeadingTail}
             </h2>
             <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
               <div>
