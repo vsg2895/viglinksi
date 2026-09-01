@@ -11,7 +11,7 @@ export default function CookieSettingsButton() {
       onClick={openCookieSettings}
       className="inline-block py-1.5 -my-1.5 text-xs text-faint transition-colors hover:text-brand"
     >
-      Cookie settings
+      Cookie Settings
     </button>
   )
 }

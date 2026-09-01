@@ -51,7 +51,7 @@ export const COPY = {
       'Ranked by payout reliability, bonus fairness and complaint history — never by commission.',
     topCasinosTitle: 'The Audited List',
     topCasinosSubtitle: 'Every operator below cleared our audit. Narrow the list by category.',
-    featuredCasinos: 'See the Audit',
+    featuredCasinos: 'See The Audit',
     specialOffers: 'Fair-Wagering Offers',
     viewAll: 'View All',
     // Leads the home <title>; the year and brand are appended in page.tsx.
@@ -83,7 +83,7 @@ export const COPY = {
     reviewSignature: 'Audited before it was listed.',
     reviewSummary: 'audited on payout reliability, bonus fairness and complaint history.',
     visitCasino: 'Open Casino',
-    readReview: 'Read the Audit',
+    readReview: 'Read The Audit',
     rating: 'Audit Score',
     noResults: 'No audited casino fits those filters yet.',
   },

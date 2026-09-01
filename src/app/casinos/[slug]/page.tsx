@@ -74,19 +74,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-/** Publication date for the "last reviewed" fact — fixed locale/zone so the
- *  statically rendered string is identical on every build machine. */
-function formatReviewDate(value: string | null | undefined): string | null {
-  if (!value) return null
-  const d = new Date(value)
-  if (Number.isNaN(d.getTime())) return null
-  return new Intl.DateTimeFormat('en-GB', {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(d)
-}
 
 export default async function CasinoDetailPage({ params }: Props) {
   const { slug } = await params
@@ -103,7 +90,6 @@ export default async function CasinoDetailPage({ params }: Props) {
   const pageUrl = `${SITE_URL}/casinos/${slug}`
   const categoryNames = (casino.categories ?? []).map((c) => c.name)
   const liveOffers = (casino.special_offers ?? []).length
-  const reviewDate = formatReviewDate(casino.updated_at)
   const reviewSchema = buildCasinoReviewSchema(casino)
   const breadcrumb = buildBreadcrumbSchema(
     [
@@ -177,7 +163,7 @@ export default async function CasinoDetailPage({ params }: Props) {
             <h2 id="at-a-glance" className="font-display text-xl font-semibold text-ink">
               {casino.name} {COPY.casinos.glanceHeadingTail}
             </h2>
-            <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-2">
+            <dl className="mt-4 grid grid-cols-1 gap-x-8 gap-y-4 sm:grid-cols-3">
               <div>
                 <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">{COPY.casinos.rating}</dt>
                 <dd className="mt-1 text-ink">{casino.rating} out of 5</dd>
@@ -194,14 +180,6 @@ export default async function CasinoDetailPage({ params }: Props) {
                 <div>
                   <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">Listed under</dt>
                   <dd className="mt-1 text-ink">{categoryNames.join(', ')}</dd>
-                </div>
-              )}
-              {reviewDate && (
-                <div>
-                  <dt className="text-xs font-semibold uppercase tracking-[0.15em] text-faint">Entry last revised</dt>
-                  <dd className="mt-1 text-ink">
-                    <time dateTime={casino.updated_at}>{reviewDate}</time>
-                  </dd>
                 </div>
               )}
             </dl>
