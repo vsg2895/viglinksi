@@ -13,8 +13,7 @@ export interface MailgunReceiver {
   email: string
   name: string | null
   source: MailgunReceiverSource
-  /** Where this address came from. Required — never null on a row created through the UI. */
-  consent_source: string | null
+  /** When the row was added. Set on every creation path. */
   consent_recorded_at: string | null
   is_active: boolean
   unsubscribed_at: string | null
@@ -28,14 +27,12 @@ export interface MailgunReceiver {
 export interface UpsertMailgunReceiverPayload {
   email: string
   name?: string | null
-  consent_source: string
 }
 
 /** Progress row for a queued spreadsheet import, polled until finished_at. */
 export interface MailgunReceiverImport {
   id: number
   filename: string
-  consent_source: string
   status: 'queued' | 'running' | 'finished' | 'failed'
   total: number
   imported: number
