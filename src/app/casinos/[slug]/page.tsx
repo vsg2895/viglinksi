@@ -6,6 +6,7 @@ import { getCasinos, getCasino } from '@/lib/api'
 import { buildCasinoReviewSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
 import CasinoSpecialOffers from '@/components/CasinoSpecialOffers'
+import CasinoReviews from '@/components/CasinoReviews'
 import { COPY } from '@/constants/copy'
 import { SITE_URL } from '@/lib/config'
 
@@ -198,6 +199,11 @@ export default async function CasinoDetailPage({ params }: Props) {
           )}
 
           <CasinoSpecialOffers offers={casino.special_offers ?? []} />
+
+          {/* Renders nothing at all until this site's "Visitor reviews"
+              switch is on in the admin — the component gates itself on the
+              endpoint's 404, so no per-site conditional is needed here. */}
+          <CasinoReviews casinoSlug={casino.slug} casinoName={casino.name} />
         </div>
       </main>
     </>

@@ -4,6 +4,7 @@ import type { Category } from '@shared/types/category'
 import type { CmsPage } from '@shared/types/cmsPage'
 import type { SpecialOffer } from '@shared/types/specialOffer'
 import type { SocialLink } from '@shared/types/socialLink'
+import type { PublicCasinoReviewsResponse } from '@shared/types/casinoReview'
 import { API_URL } from './config'
 
 const SITE = process.env.NEXT_PUBLIC_SITE_SLUG
@@ -30,6 +31,28 @@ async function publicFetch<T>(path: string, tags: string[] = []): Promise<T> {
     },
     next: { revalidate: 3600, tags: [`site:${SITE}`, ...tags] },
   })
+
+  if (!res.ok) {
+    throw new Error(`API ${path} failed: ${res.status}`)
+  }
+
+  return res.json() as Promise<T>
+}
+
+/**
+ * A fetch that tolerates a 404.
+ *
+ * The reviews endpoints 404 when the SITE has that feature switched off, which
+ * is a normal state rather than an error — so those callers need "not
+ * available" instead of a thrown exception.
+ */
+async function optionalFetch<T>(path: string, tags: string[] = []): Promise<T | null> {
+  const res = await fetch(`${API}/sites/${SITE}${path}`, {
+    headers: { 'X-Site-Key': KEY as string, Accept: 'application/json' },
+    next: { revalidate: 3600, tags: [`site:${SITE}`, ...tags] },
+  })
+
+  if (res.status === 404) return null
 
   if (!res.ok) {
     throw new Error(`API ${path} failed: ${res.status}`)
@@ -164,5 +187,18 @@ export const getPage = async (slug: string): Promise<CmsPage | null> => {
   const json = (await res.json()) as { data: CmsPage }
   return json.data
 }
+
+
+// ── Casino reviews ───────────────────────────────────────────────────────────
+// Published reviews only — anything awaiting moderation never reaches the API.
+// Null means this site has reviews switched off (Sites → Visitor reviews), which
+// is why the whole section can gate itself on this one call rather than asking
+// a separate features endpoint first.
+
+export const getCasinoReviews = (
+  casinoSlug: string,
+  page = 1,
+): Promise<ApiResponse<PublicCasinoReviewsResponse> | null> =>
+  optionalFetch(`/casinos/${casinoSlug}/reviews?page=${page}`, ['reviews', `casino:${casinoSlug}`])
 
 export type { PaginatedResponse }
