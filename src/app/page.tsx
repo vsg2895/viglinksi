@@ -132,7 +132,7 @@ export default async function HomePage({ searchParams }: Props) {
                 <p className="mt-2 text-muted">{COPY.home.topCasinosSubtitle}</p>
               </div>
               {selected && (
-                <Link href={`/categories/${selected}`} className="text-sm font-bold text-brand hover:text-brand-dark whitespace-nowrap">{COPY.home.viewAll} →</Link>
+                <Link href={`/categories/${selected}`} className="inline-block py-1 -my-1 text-sm font-bold text-brand hover:text-brand-dark whitespace-nowrap">{COPY.home.viewAll} →</Link>
               )}
             </div>
 
@@ -164,7 +164,7 @@ export default async function HomePage({ searchParams }: Props) {
             <div className="container mx-auto max-w-6xl">
               <div className="mb-10 flex items-end justify-between gap-4">
                 <h2 id="offers-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.specialOffers}</h2>
-                <Link href="/special-offers" className="hidden text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
+                <Link href="/special-offers" className="hidden py-1 -my-1 text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
               </div>
               <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                 {topOffers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}

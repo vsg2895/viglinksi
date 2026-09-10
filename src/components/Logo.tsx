@@ -40,7 +40,7 @@ export default function Logo({ className = '' }: { className?: string }) {
         <span className="font-sans text-[22px] font-bold tracking-tight text-ink">
           Vig<span className="text-brand">linksi</span>
         </span>
-        <span className="mt-[3px] text-[10px] font-medium tracking-[0.25em] text-faint">
+        <span className="mt-[3px] text-[11px] font-medium tracking-[0.18em] text-faint">
           CASINO INTELLIGENCE
         </span>
       </span>
