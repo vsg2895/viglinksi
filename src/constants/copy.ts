@@ -111,7 +111,24 @@ export const COPY = {
     subtitle: 'We email when a casino is removed from the list — and when one earns a place on it.',
     placeholder: 'Email for audit updates',
     button: 'Subscribe',
-    success: 'One step left — confirm the link in your inbox to start receiving audit updates.',
+    // Shown while the address is being checked. The subscribe request now
+    // waits on a live address-validation call, so the button has to say so
+    // rather than just dimming for a second or two.
+    checking: 'Checking…',
+        // The spam line is NOT optional wording. This is a double opt-in list: an
+    // unconfirmed subscriber never receives anything again, and the verify mail
+    // is the single most likely message to be filtered — new sender, one link,
+    // no history. Telling people where to look is the difference between a
+    // signup and a dead row.
+    success:
+      'One step left — confirm the link in your inbox to start receiving audit updates. '
+      + 'Not in your inbox? Try the spam or junk folder.',
+    // Shown when the API reports email_sent=false — the site is still
+    // collecting addresses but its sending is switched off in the admin.
+    // Promising an inbox (and a spam folder to search) for mail that will
+    // never arrive is worse than not collecting the address at all.
+    successNoEmail:
+      "You're on the list. Confirmation emails are switched off on this site for now.",
     error: 'That did not register. Please try again in a moment.',
   },
   footer: {
