@@ -21,6 +21,19 @@ const manrope = Manrope({ variable: '--font-manrope', subsets: ['latin'], weight
 const instrumentSerif = Instrument_Serif({ variable: '--font-instrument-serif', subsets: ['latin'], weight: '400', style: ['normal', 'italic'] })
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
+/**
+ * Subscribe capture is switched OFF site-wide.
+ *
+ * One constant, gating every entry point on this site: the newsletter form and
+ * — where the site has one — the timed subscribe modal. The components, the
+ * /api/newsletter route and the backend double-opt-in flow are all untouched
+ * and still work; nothing is rendered, so nothing can be submitted.
+ *
+ * Flip this to `true` to bring the whole thing back. No other edit is needed,
+ * which is the point of doing it with a flag rather than by deleting markup.
+ */
+const SUBSCRIBE_ENABLED = false
+
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? 'Viglinksi'
 
 // Both strings live in COPY so this site's wording is defined in exactly one
@@ -192,12 +205,14 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
         </header>
 
-        {/* Newsletter strip — directly under the header */}
-        <section className="border-b border-line bg-paper/50 backdrop-blur-xl">
-          <div className="container mx-auto max-w-6xl px-4 py-5">
-            <NewsletterForm />
-          </div>
-        </section>
+        {/* Newsletter strip — hidden while SUBSCRIBE_ENABLED is false. */}
+        {SUBSCRIBE_ENABLED && (
+          <section className="border-b border-line bg-paper/50 backdrop-blur-xl">
+            <div className="container mx-auto max-w-6xl px-4 py-5">
+              <NewsletterForm />
+            </div>
+          </section>
+        )}
 
         <div className="flex-1">{children}</div>
 
@@ -227,7 +242,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
                 <ul className="flex flex-col gap-2">
                   {navLinks.map(({ href, label }) => (
                     <li key={href}>
-                      <Link href={href} className="inline-block py-1.5 -my-1.5 text-sm text-ink-soft transition-colors hover:text-brand">{label}</Link>
+                      <Link href={href} className="inline-block -mx-1 px-1 py-3 -my-3 text-sm text-ink-soft transition-colors hover:text-brand">{label}</Link>
                     </li>
                   ))}
                 </ul>
@@ -238,7 +253,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
               <ul className="flex flex-wrap gap-x-5 gap-y-2">
                 {LEGAL_PAGES.map(({ slug, label }) => (
                   <li key={slug}>
-                    <Link href={`/${slug}`} className="inline-block py-1.5 -my-1.5 text-xs text-faint transition-colors hover:text-brand">{label}</Link>
+                    <Link href={`/${slug}`} className="inline-block -mx-1 px-1 py-3 -my-3 text-xs text-faint transition-colors hover:text-brand">{label}</Link>
                   </li>
                 ))}
                 <li>

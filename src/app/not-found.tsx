@@ -43,7 +43,7 @@ export default async function NotFound() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex rounded-full border border-line-soft bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
+                  className="inline-flex min-h-11 items-center rounded-full border border-line-soft bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
                 >
                   {label}
                 </Link>

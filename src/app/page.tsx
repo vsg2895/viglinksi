@@ -12,6 +12,20 @@ import type { Category } from '@shared/types/category'
 import type { CasinoWithAttachment } from '@shared/types/casino'
 import type { SpecialOffer } from '@shared/types/specialOffer'
 
+/**
+ * Grid placement for the FAQ cards. The grid is 2-up on tablets and 3-up on
+ * desktop, and the number of questions is whatever the site's faq.ts holds, so
+ * the LAST card stretches across whatever the final row leaves empty — five
+ * questions fill a 3-column grid exactly instead of leaving a hole.
+ */
+function faqSpan(i: number): string {
+  const last = i === FAQ_ITEMS.length - 1
+  if (!last) return ''
+  const sm = FAQ_ITEMS.length % 2 === 1 ? 'sm:col-span-2' : 'sm:col-span-1'
+  const lg = { 0: 'lg:col-span-1', 1: 'lg:col-span-3', 2: 'lg:col-span-2' }[FAQ_ITEMS.length % 3] ?? ''
+  return `${sm} ${lg}`
+}
+
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
 const YEAR = new Date().getFullYear()
 
@@ -132,7 +146,7 @@ export default async function HomePage({ searchParams }: Props) {
                 <p className="mt-2 text-muted">{COPY.home.topCasinosSubtitle}</p>
               </div>
               {selected && (
-                <Link href={`/categories/${selected}`} className="inline-block py-1 -my-1 text-sm font-bold text-brand hover:text-brand-dark whitespace-nowrap">{COPY.home.viewAll} →</Link>
+                <Link href={`/categories/${selected}`} className="inline-block -mx-1 px-1 py-3 -my-3 text-sm font-bold text-brand hover:text-brand-dark whitespace-nowrap">{COPY.home.viewAll} →</Link>
               )}
             </div>
 
@@ -164,7 +178,7 @@ export default async function HomePage({ searchParams }: Props) {
             <div className="container mx-auto max-w-6xl">
               <div className="mb-10 flex items-end justify-between gap-4">
                 <h2 id="offers-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.specialOffers}</h2>
-                <Link href="/special-offers" className="hidden py-1 -my-1 text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
+                <Link href="/special-offers" className="hidden py-3 -my-3 text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
               </div>
               <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
                 {topOffers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
@@ -178,15 +192,20 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
           </section>
         )}
-        {/* FAQ — rendered visibly because FAQPage structured data requires it. */}
-        <section className="border-t border-line px-4 py-16" aria-labelledby="faq-heading">
-          <div className="container mx-auto max-w-3xl">
+        {/* FAQ — rendered visibly because FAQPage structured data requires it.
+            Wider than the rest of the page (90rem, not the 6xl the listings
+            use) and with roomier cards on desktop: a block of prose reads better with a
+            longer measure than a list of casino cards does, and the old
+            max-w-3xl column left a third of the screen empty on each side.
+            Three-up card grid, two-up on tablets, one column on phones. */}
+        <section className="border-t border-line px-4 py-16 sm:px-6 lg:px-8 lg:py-20" aria-labelledby="faq-heading">
+          <div className="mx-auto max-w-[90rem]">
             <h2 id="faq-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.faqTitle}</h2>
-            <dl className="mt-8 space-y-6">
-              {FAQ_ITEMS.map((item) => (
-                <div key={item.question} className="border-b border-line pb-6">
-                  <dt className="font-bold text-ink">{item.question}</dt>
-                  <dd className="mt-2 text-muted">{item.answer}</dd>
+            <dl className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
+              {FAQ_ITEMS.map((item, i) => (
+                <div key={item.question} className={`${faqSpan(i)} rounded-2xl bg-paper p-6 lg:p-8 shadow-[0_10px_30px_rgba(28,36,48,0.07)]`}>
+                  <dt className="font-bold text-ink text-base lg:text-lg">{item.question}</dt>
+                  <dd className="mt-3 text-sm leading-relaxed text-muted lg:text-base">{item.answer}</dd>
                 </div>
               ))}
             </dl>

@@ -78,7 +78,7 @@ export default function CasinoCard({ casino, rank }: { casino: CasinoWithAttachm
         </a>
         <Link
           href={`/casinos/${casino.slug}`}
-          className="rounded-xl border border-line-soft bg-paper px-8 py-2.5 text-center text-sm font-bold text-ink transition-colors hover:border-brand hover:text-brand"
+          className="inline-flex min-h-11 items-center justify-center rounded-xl border border-line-soft bg-paper px-8 py-2.5 text-center text-sm font-bold text-ink transition-colors hover:border-brand hover:text-brand"
         >
           {COPY.casinos.readReview}
         </Link>

@@ -82,7 +82,7 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
       <main className="py-12 px-4">
         <div className="container mx-auto max-w-3xl">
           <nav className="mb-6 text-sm text-faint">
-            <Link href="/" className="inline-block py-1 -my-1 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block py-1 -my-1 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
+            <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
           </nav>
 
           {banner && (

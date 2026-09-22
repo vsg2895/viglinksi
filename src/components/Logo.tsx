@@ -15,7 +15,7 @@ export default function Logo({ className = '' }: { className?: string }) {
     <Link
       href="/"
       aria-label="Viglinksi home"
-      className={`inline-flex shrink-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${className}`.trim()}
+      className={`inline-flex min-h-11 shrink-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${className}`.trim()}
     >
       {/* Audit seal */}
       <span
@@ -40,7 +40,7 @@ export default function Logo({ className = '' }: { className?: string }) {
         <span className="font-sans text-[22px] font-bold tracking-tight text-ink">
           Vig<span className="text-brand">linksi</span>
         </span>
-        <span className="mt-[3px] text-[11px] font-medium tracking-[0.18em] text-faint">
+        <span className="mt-[3px] text-xs font-medium tracking-[0.18em] text-faint">
           CASINO INTELLIGENCE
         </span>
       </span>

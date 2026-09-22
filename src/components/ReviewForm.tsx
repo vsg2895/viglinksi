@@ -142,7 +142,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
               aria-pressed={rating === n}
               aria-label={`${n} out of 5`}
               onClick={() => setRating(n)}
-              className={`h-10 w-10 rounded-xl border text-sm font-semibold transition-colors ${
+              className={`h-11 w-11 rounded-xl border text-sm font-semibold transition-colors ${
                 rating >= n
                   ? 'border-brand bg-gradient-to-b from-brand-soft to-brand-dark text-white'
                   : 'border-line-soft bg-paper text-faint hover:border-brand'
