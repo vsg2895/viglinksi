@@ -22,17 +22,15 @@ const instrumentSerif = Instrument_Serif({ variable: '--font-instrument-serif', 
 const geistMono = Geist_Mono({ variable: '--font-geist-mono', subsets: ['latin'] })
 
 /**
- * Subscribe capture is switched OFF site-wide.
+ * Subscribe capture: every entry point on this site — the newsletter form and,
+ * where the site has one, the timed subscribe modal.
  *
- * One constant, gating every entry point on this site: the newsletter form and
- * — where the site has one — the timed subscribe modal. The components, the
- * /api/newsletter route and the backend double-opt-in flow are all untouched
- * and still work; nothing is rendered, so nothing can be submitted.
- *
- * Flip this to `true` to bring the whole thing back. No other edit is needed,
- * which is the point of doing it with a flag rather than by deleting markup.
+ * The components, the /api/newsletter route and the backend double-opt-in flow
+ * are never touched by this; it only decides whether they are rendered. That is
+ * the point of a flag rather than deleted markup: turning capture off and back
+ * on is one edit, and nothing has to be rebuilt from memory.
  */
-const SUBSCRIBE_ENABLED = false
+const SUBSCRIBE_ENABLED = true
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? 'Viglinksi'
 
@@ -205,7 +203,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           </div>
         </header>
 
-        {/* Newsletter strip — hidden while SUBSCRIBE_ENABLED is false. */}
+        {/* Newsletter strip — rendered while SUBSCRIBE_ENABLED is true. */}
         {SUBSCRIBE_ENABLED && (
           <section className="border-b border-line bg-paper/50 backdrop-blur-xl">
             <div className="container mx-auto max-w-6xl px-4 py-5">
