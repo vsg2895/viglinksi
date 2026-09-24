@@ -14,7 +14,7 @@
  *
  * viglinksi's angle, taken from the design in sites/Viglinksi.html: the auditor
  * who reads the small print — ranked on payout reliability, bonus fairness and
- * complaint history rather than commission.
+ * complaint history.
  */
 export const COPY = {
   // Site-wide identity. These feed the root layout's fallback <title>, the
@@ -48,7 +48,7 @@ export const COPY = {
     heroHeadline: 'Casino reviews that read',
     heroHighlight: 'the terms before you do',
     heroSubtitle:
-      'Ranked by payout reliability, bonus fairness and complaint history — never by commission.',
+      'Ranked by payout reliability, bonus fairness and complaint history.',
     topCasinosTitle: 'The Audited List',
     topCasinosSubtitle: 'Every operator below cleared our audit. Narrow the list by category.',
     featuredCasinos: 'See The Audit',
@@ -58,7 +58,7 @@ export const COPY = {
     homeTitle: 'Casino Audits: Payouts & Terms',
     faqTitle: 'What players ask us before signing up',
     metaDescription:
-      'Online casinos audited on payout reliability, bonus fairness and complaint history — never ranked by commission.',
+      'Online casinos audited on payout reliability, bonus fairness and complaint history.',
   },
   casinos: {
     pageTitle: 'Every Casino We Have Audited',
@@ -149,7 +149,7 @@ export const COPY = {
     // used in the email templates.
     postalAddress: '10 Albert Square, Manchester M2 5DB, United Kingdom',
     disclaimer:
-      'Gambling carries real financial risk and is for adults aged 18 and over only. Treat it as entertainment, never as income, and stop when it stops being fun. Some links here earn us a commission; it plays no part in whether a casino passes the audit.',
+      'Gambling carries real financial risk and is for adults aged 18 and over only. Treat it as entertainment, never as income, and stop when it stops being fun.',
   },
   errors: {
     notFound: 'No page at this address. It may have been retired after a re-audit.',

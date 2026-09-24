@@ -16,11 +16,6 @@ export const FAQ_ITEMS = [
       "It has to clear an audit: a current licence, withdrawal limits that match its published terms, a bonus whose wagering we would accept ourselves, and no unresolved pattern of payout complaints. Failing any one keeps it off the list.",
   },
   {
-    question: "Do you get paid by the casinos you list?",
-    answer:
-      "We may earn a commission on sign-ups through our links. Ranking is never for sale, and commission plays no part in whether an operator passes the audit or where it appears.",
-  },
-  {
     question: "What does the rating actually measure?",
     answer:
       "Payout reliability, the fairness of bonus terms and complaint history, weighted in that order. It is a single editorial score, not an average of user votes.",
