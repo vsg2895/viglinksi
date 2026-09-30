@@ -101,9 +101,11 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
           </nav>
 
+          {/* No object-fit — see SpecialOfferCard. The banner fills its box and
+              nothing is cropped off its edges. */}
           {banner && (
             <div className="relative mb-6 aspect-[16/6] overflow-hidden rounded-2xl bg-cream">
-              <Image src={banner} alt={offer.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, 768px" priority />
+              <Image src={banner} alt={offer.title} fill sizes="(max-width: 768px) 100vw, 768px" priority />
             </div>
           )}
 

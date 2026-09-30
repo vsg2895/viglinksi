@@ -11,8 +11,12 @@ export default function SpecialOfferCard({ offer }: { offer: SpecialOffer }) {
 
   return (
     <article className="group flex flex-col overflow-hidden rounded-2xl bg-paper shadow-[0_10px_30px_rgba(0,0,0,0.35)] transition-all hover:-translate-y-0.5 hover:shadow-[0_18px_40px_rgba(0,0,0,0.5)]">
+      {/* NO object-fit on the banner, deliberately. `fill` already stretches
+          it to the box, so the browser's default applies and the whole banner
+          is shown edge to edge instead of having its edges trimmed to match the
+          16:9 frame. */}
       <Link href={`/special-offers/${offer.slug}`} className="relative block aspect-video overflow-hidden bg-cream">
-        {preview && <Image src={preview} alt={offer.title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 400px" />}
+        {preview && <Image src={preview} alt={offer.title} fill className="transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 400px" />}
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-6">
         <h3 className="font-display text-lg font-semibold leading-tight text-ink">{offer.title}</h3>
