@@ -19,6 +19,17 @@ export default function SpecialOfferCard({ offer }: { offer: SpecialOffer }) {
         {preview && <Image src={preview} alt={offer.title} fill className="transition-transform duration-300 group-hover:scale-105" sizes="(max-width: 768px) 100vw, 400px" />}
       </Link>
       <div className="flex flex-1 flex-col gap-3 p-6">
+        {/* WHOSE bonus this is, above its name.
+        The title says what the offer gives; a card in a grid of twenty does
+        not say who gives it, which is the first thing someone comparing
+        offers needs. Bold and in the brand accent so it reads as a byline
+        rather than a second heading competing with the title below.
+        Rendered only when the casino is loaded — the relation is eager
+        loaded on every endpoint that feeds these cards, and a card without
+        it simply omits the line rather than printing a blank. */}
+        {offer.casino?.name && (
+          <p className="text-sm font-bold text-win">{offer.casino.name}</p>
+        )}
         <h3 className="font-display text-lg font-semibold leading-tight text-ink">{offer.title}</h3>
         {offer.bonuses && <p className="inline-block rounded-lg bg-win-bg px-3 py-1.5 text-sm font-bold text-win">{offer.bonuses}</p>}
         <span className="text-gold" aria-label={`${offer.rating} out of 5`}>{'★'.repeat(offer.rating)}<span className="text-line-soft">{'★'.repeat(5 - offer.rating)}</span></span>
