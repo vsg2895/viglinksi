@@ -26,9 +26,13 @@ export default function CategoryNav({
             // canonical category route — never through the 301.
             href={basePath === '/' ? `/?category=${c.slug}` : `/categories/${c.slug}`}
             aria-current={active ? 'page' : undefined}
+            // The active chip carries a TRANSPARENT border purely so its box model
+            // matches the inactive ones, which are bordered. Without it the selected
+            // chip is 2px shorter — invisible while chips share a row and are
+            // stretched to match, obvious the moment they wrap to one per row.
             className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${
               active
-                ? 'bg-gradient-to-b from-brand-soft to-brand-dark text-black shadow-md shadow-brand/25'
+                ? 'border border-transparent bg-gradient-to-b from-brand-soft to-brand-dark text-black shadow-md shadow-brand/25'
                 : 'border border-line-soft bg-paper text-ink hover:border-brand hover:text-brand'
             }`}
           >
