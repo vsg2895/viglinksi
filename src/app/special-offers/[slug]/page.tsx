@@ -1,10 +1,10 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSpecialOffer } from '@/lib/api'
 import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
-import OfferBanner from '@/components/OfferBanner'
 import { COPY } from '@/constants/copy'
 import { SITE_URL } from '@/lib/config'
 
@@ -101,12 +101,22 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
           </nav>
 
-          {/* Whole banner on the shared bonus backdrop — the same treatment the
-              cards give it, so the artwork a visitor clicked is the artwork
-              that opens. See OfferBanner. */}
+          {/* The artwork alone — NO shared backdrop here, deliberately.
+              The backdrop exists to make a GRID of bonus cards read as one set;
+              this page shows a single bonus at full width, where there is no set
+              to belong to and the gold ground would only compete with the
+              artwork it sits behind. `object-contain` stays: nothing is cropped
+              off the edges of a banner meant to be read whole. */}
           {banner && (
             <div className="relative mb-6 aspect-[16/6] overflow-hidden rounded-2xl bg-cream">
-              <OfferBanner src={banner} alt={offer.title} sizes="(max-width: 768px) 100vw, 768px" priority />
+              <Image
+                src={banner}
+                alt={offer.title}
+                fill
+                sizes="(max-width: 768px) 100vw, 768px"
+                priority
+                className="object-contain object-center"
+              />
             </div>
           )}
 
