@@ -39,7 +39,10 @@ export const COPY = {
   },
   nav: {
     casinos: 'Casinos',
-    specialOffers: 'Special Offers',
+    // The page lists every visible bonus, flat and ungrouped, so the menu
+    // says what is behind it. winpalack keeps "Special Offers": its page is
+    // the grouped bonus-area view and is a different thing.
+    specialOffers: 'Bonuses',
     categories: 'Categories',
   },
   home: {
