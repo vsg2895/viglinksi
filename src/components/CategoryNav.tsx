@@ -30,9 +30,17 @@ export default function CategoryNav({
             // matches the inactive ones, which are bordered. Without it the selected
             // chip is 2px shorter — invisible while chips share a row and are
             // stretched to match, obvious the moment they wrap to one per row.
+            //
+            // `bg-origin-border` is what that border costs. A gradient is sized to the
+            // PADDING box but clipped to the BORDER box, and the leftover strip is
+            // filled by the image repeating — so the 1px of border showed the tail of
+            // the previous tile, i.e. the gradient's far end, as a dark hairline along
+            // the edge of the selected chip. Sizing it to the border box leaves nothing
+            // to repeat. This chip is the only bordered button on the site, which is
+            // why no other gradient here shows the same line.
             className={`flex items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${
               active
-                ? 'border border-transparent bg-gradient-to-b from-brand-soft to-brand-dark text-black shadow-md shadow-brand/25'
+                ? 'border border-transparent bg-origin-border bg-gradient-to-b from-brand-soft to-brand-dark text-black shadow-md shadow-brand/25'
                 : 'border border-line-soft bg-paper text-ink hover:border-brand hover:text-brand'
             }`}
           >

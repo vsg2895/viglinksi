@@ -56,7 +56,7 @@ export const COPY = {
     viewAll: 'View All',
     // Leads the home <title>; the year and brand are appended in page.tsx.
     homeTitle: 'Casino Audits: Payouts & Terms',
-    faqTitle: 'What players ask us before signing up',
+    faqTitle: 'What Players Ask Us Before Signing Up',
     metaDescription:
       'Online casinos audited on payout reliability, bonus fairness and complaint history.',
   },
@@ -98,7 +98,7 @@ export const COPY = {
     noResults: 'No offer has passed the audit at the moment.',
   },
   categories: {
-    pageTitle: 'Audited by Category',
+    pageTitle: 'Audited By Category',
     pageDescription:
       'Browse audited casinos by payout speed, game type and the fairness of their bonus terms.',
     // Meta-description tail for a single category page. Category records are
@@ -107,7 +107,7 @@ export const COPY = {
     noResults: 'Nothing audited in this category yet.',
   },
   newsletter: {
-    title: 'Delistings, in your inbox',
+    title: 'Delistings, In Your Inbox',
     subtitle: 'We email when a casino is removed from the list — and when one earns a place on it.',
     placeholder: 'Email for audit updates',
     button: 'Subscribe',
