@@ -202,3 +202,96 @@ export const getCasinoReviews = (
   optionalFetch(`/casinos/${casinoSlug}/reviews?page=${page}`, ['reviews', `casino:${casinoSlug}`])
 
 export type { PaginatedResponse }
+
+
+// ── Bonus area ───────────────────────────────────────────────────────────────
+//
+// The bonus TYPES (Welcome Bonuses, Free Spins, Cashback …), which the home
+// page shows as a row of chips under the hero and which each have a page of
+// their own. Gated server-side on the site's `bonus_enabled` switch: the
+// endpoint 404s without it, and both fetchers below fail closed, so a site that
+// does not publish the area simply renders nothing.
+
+/** One bonus type, with a preview of the offers filed under it. */
+export interface BonusSection {
+  id: number
+  name: string
+  slug: string
+  description: string | null
+  /**
+   * The type's SVG mark on the API's storage disk, or null.
+   *
+   * Resolve with `resolveImageUrl()` — the same path shape as a casino
+   * category's `logo_path`.
+   */
+  icon_path: string | null
+  position: number
+  /**
+   * Every bonus filed under this type that is visible on THIS site.
+   *
+   * NOT `offers.length`: that array is capped by the `limit` the caller asked
+   * for, so counting it would report "1" for a type holding sixteen. The server
+   * counts the unlimited set with the same visibility rule it builds the list
+   * with.
+   */
+  offers_count: number
+  offers: SpecialOffer[]
+}
+
+/** One bonus type with a page of its offers — what /bonuses/[slug] renders. */
+export interface BonusCategoryPage {
+  category: {
+    id: number
+    name: string
+    slug: string
+    description: string | null
+    icon_path: string | null
+    position: number
+  }
+  offers: SpecialOffer[]
+  meta: { current_page: number; last_page: number; per_page: number; total: number }
+}
+
+/**
+ * Every bonus type that holds at least one visible offer on this site.
+ *
+ * `limit` caps the offers loaded per type. The chip row needs none of them —
+ * only the name, the mark and the count — so it asks for 1 rather than 0,
+ * which means "no cap" and would drag the whole catalogue across for a number
+ * the server has already counted.
+ *
+ * Fails CLOSED: an empty array means "this site publishes no Bonus area", and
+ * the strip renders nothing rather than an empty band.
+ */
+export const getBonusArea = async (limit = 1): Promise<BonusSection[]> => {
+  try {
+    const res = await publicFetch<ApiResponse<BonusSection[]>>(
+      `/bonus?limit=${limit}`,
+      ['bonus', 'special-offers'],
+    )
+    return res.data
+  } catch {
+    return []
+  }
+}
+
+/**
+ * A single bonus type, paginated — the page behind each chip.
+ *
+ * Returns null rather than throwing on a 404 so the route can render
+ * `notFound()` for an unknown or unpublished slug instead of a 500.
+ */
+export const getBonusCategory = async (
+  slug: string,
+  page = 1,
+): Promise<BonusCategoryPage | null> => {
+  try {
+    const res = await publicFetch<ApiResponse<BonusCategoryPage>>(
+      `/bonus/${slug}?page=${page}`,
+      ['bonus', 'special-offers', `bonus:${slug}`],
+    )
+    return res.data
+  } catch {
+    return null
+  }
+}

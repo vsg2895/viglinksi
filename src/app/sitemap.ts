@@ -1,5 +1,5 @@
 import type { MetadataRoute } from 'next'
-import { getCasinos, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
+import { getBonusArea, getCasinos, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
 import { SITE_URL } from '@/lib/config'
 
 
@@ -10,10 +10,13 @@ function safeDate(value: string | null | undefined): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [casinosRes, categoriesRes, offersRes] = await Promise.allSettled([
+  const [casinosRes, categoriesRes, offersRes, bonusRes] = await Promise.allSettled([
     getCasinos(),
     getCategories(),
     getSpecialOffers(),
+    // The bonus types that have a page on this site. allSettled, so a site
+    // without the Bonus area simply contributes no URLs.
+    getBonusArea(1),
   ])
 
   const casinoUrls: MetadataRoute.Sitemap =
@@ -96,12 +99,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // They remain reachable and crawlable: every footer links to all eleven.
   const legalUrls: MetadataRoute.Sitemap = []
 
+  const bonusUrls: MetadataRoute.Sitemap =
+    bonusRes.status === 'fulfilled'
+      ? bonusRes.value.map((section) => ({
+          url: `${SITE_URL}/bonuses/${section.slug}`,
+          lastModified: new Date(),
+          changeFrequency: 'daily' as const,
+          // Below /special-offers (0.9), which is the whole area, and level with
+          // a category listing: these are the sections that area is made of.
+          priority: 0.8,
+        }))
+      : []
+
   return [
     ...staticUrls,
     ...casinoUrls,
     ...categoryUrls,
     ...paginatedCategoryUrls,
     ...offerUrls,
+    ...bonusUrls,
     ...legalUrls,
   ]
 }
