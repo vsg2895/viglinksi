@@ -111,7 +111,7 @@ export default function BonusCategoryNav({ sections }: { sections: BonusSection[
 
           return (
             <li key={section.id}>
-              <Link href={`/bonuses/${section.slug}`} className="flex h-full w-full min-h-11 items-center justify-center gap-2.5 rounded-full border border-line-soft bg-paper px-5 py-3 text-sm font-semibold text-ink transition-all hover:border-brand hover:text-brand">
+              <Link href={`/bonuses/${section.slug}`} className="flex h-full w-full min-h-11 items-center gap-2.5 rounded-full border border-line-soft bg-paper px-5 py-3 text-sm font-semibold text-ink transition-all hover:border-brand hover:text-brand">
                 {icon && (
                   /*
                    * A plain <img>, not next/image: the optimizer refuses SVG
@@ -132,10 +132,16 @@ export default function BonusCategoryNav({ sections }: { sections: BonusSection[
                   />
                 )}
 
+                {/* LEFT-aligned, not centred.
+                    With the tracks equal and the contents centred, every chip
+                    put its icon and its label at a different distance from its
+                    own left edge — so the column read as ragged even though the
+                    boxes were identical. Starting them all at the same point is
+                    what makes a set of equal boxes look like a set. */}
                 <span>{section.name}</span>
 
                 {/* Inside the link, as part of what the button says. */}
-                <span className="text-xs text-faint font-semibold tabular-nums">{section.offers_count}</span>
+                <span className="ml-auto text-xs text-faint font-semibold tabular-nums">{section.offers_count}</span>
               </Link>
             </li>
           )
