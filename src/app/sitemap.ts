@@ -1,6 +1,8 @@
 import type { MetadataRoute } from 'next'
-import { getBonusArea, getCasinos, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
+import { getPage, getBonusArea, getCasinos, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
 import { SITE_URL } from '@/lib/config'
+import { canonicalUrl } from '@/lib/seo/canonical'
+import { TRUST_PAGE_SLUGS } from '@/constants/legalPages'
 
 
 // Guard against missing/invalid timestamps so the sitemap never fails to render.
@@ -51,7 +53,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           const pages: MetadataRoute.Sitemap = []
           for (let page = 2; page <= meta.last_page; page++) {
             pages.push({
-              url: `${SITE_URL}/categories/${c.slug}?page=${page}`,
+              url: canonicalUrl(`/categories/${c.slug}`, page),
               lastModified: safeDate(c.updated_at),
               changeFrequency: 'weekly',
               priority: 0.4,
@@ -67,14 +69,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     )
   ).flat()
 
+  /*
+   * A SITEMAP MUST NOT CONTRADICT A PAGE HEADER.
+   *
+   * This mapped every offer the endpoint returned. An offer carrying
+   * `seo.noindex` was therefore submitted as "index this" while the page itself
+   * said "do not" — the exact conflict Search Console reports, and the sitemap
+   * loses that argument every time. Same for an inactive offer, whose page
+   * serves the stricter `index: false, follow: false`.
+   *
+   * Both flags are checked here rather than trusted to the endpoint: the list
+   * is built for the public site, not for this file, and a sitemap is the one
+   * place where being wrong is a signal rather than a glitch.
+   */
   const offerUrls: MetadataRoute.Sitemap =
     offersRes.status === 'fulfilled'
-      ? offersRes.value.data.map((o) => ({
-          url: `${SITE_URL}/special-offers/${o.slug}`,
-          lastModified: safeDate(o.updated_at),
-          changeFrequency: 'weekly',
-          priority: 0.7,
-        }))
+      ? offersRes.value.data
+          // `is_indexable` and not `seo.noindex`: the server-side rule already
+          // folds the admin flag in, and adds the thin-content test the page's
+          // robots tag uses. One definition, so the sitemap and the header
+          // cannot disagree.
+          .filter((o) => o.active !== false && o.is_indexable !== false)
+          .map((o) => ({
+            url: `${SITE_URL}/special-offers/${o.slug}`,
+            lastModified: safeDate(o.updated_at),
+            changeFrequency: 'weekly' as const,
+            priority: 0.7,
+          }))
       : []
 
   // NOTE — /casinos is deliberately absent. Under the Option B consolidation it
@@ -88,16 +109,54 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${SITE_URL}/categories`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
   ]
 
-  // THE LEGAL PAGES ARE DELIBERATELY ABSENT FROM THIS SITEMAP.
-  //
-  // They are served with `noindex, follow` (see app/[slug]/page.tsx) because
-  // all eleven are generated from one template shared by every site in the
-  // network. Listing a noindexed URL in a sitemap is a contradictory signal —
-  // the sitemap says "index this", the page header says "do not" — and Search
-  // Console reports it as an error rather than resolving it.
-  //
-  // They remain reachable and crawlable: every footer links to all eleven.
-  const legalUrls: MetadataRoute.Sitemap = []
+  /*
+   * THE TRUST PAGES, and only the ones this site actually publishes as
+   * indexable.
+   *
+   * This was `const legalUrls = []` with a comment saying all eleven standard
+   * pages are noindex and a sitemap must never contradict a page header. The
+   * first half of that is no longer true: six of them are still noindex, but
+   * /about, /contact, /responsible-gambling, /affiliate-disclosure and
+   * /editorial-policy now carry `index, follow` — Search Console was reporting
+   * them as "Excluded by noindex", and on a gambling affiliate they are exactly
+   * the pages Google's quality guidance looks for.
+   *
+   * The second half still holds, which is why this ASKS rather than assumes:
+   * each page is fetched and submitted only when the API says it is published
+   * and not noindexed. Flip `noindex` on in the admin and the URL leaves this
+   * sitemap on the next revalidation, with no deploy and no contradiction.
+   *
+   * Five cached, tagged fetches — the same `getPage()` the route itself uses,
+   * so a warm cache makes this free.
+   */
+  const trustPages = await Promise.all(
+    TRUST_PAGE_SLUGS.map(async (slug) => {
+      try {
+        const page = await getPage(slug)
+
+        return page !== null && page.noindex !== true ? { slug, page } : null
+      } catch {
+        // One unreachable page must not empty the whole sitemap.
+        return null
+      }
+    }),
+  )
+
+  // `flatMap` with an empty array for the misses, rather than `filter` plus a
+  // type predicate: the predicate had to restate the element type, and
+  // restating a literal-union slug is how it went out of sync with the source.
+  const legalUrls: MetadataRoute.Sitemap = trustPages.flatMap((entry) =>
+    entry === null
+      ? []
+      : [
+          {
+            url: `${SITE_URL}/${entry.slug}`,
+            lastModified: safeDate(entry.page.updated_at),
+            changeFrequency: 'monthly' as const,
+            priority: 0.4,
+          },
+        ],
+  )
 
   const bonusUrls: MetadataRoute.Sitemap =
     bonusRes.status === 'fulfilled'

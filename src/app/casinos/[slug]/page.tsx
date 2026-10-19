@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
-import { getCasino } from '@/lib/api'
+import { notFound, permanentRedirect } from 'next/navigation'
+import { getCasinos, getCasino } from '@/lib/api'
 import { buildCasinoReviewSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
 import CasinoSpecialOffers from '@/components/CasinoSpecialOffers'
@@ -92,6 +92,46 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 
+/**
+ * Resolve a TRUNCATED slug to the real one, or return null.
+ *
+ * Search Console reported `/casinos/7` as a 404. There is no casino "7" and
+ * there never was: slugs come from the operator name via spatie/sluggable, and
+ * not one of them is numeric. What does exist is `7-bit-casino` — and cutting
+ * that at its first hyphen gives exactly the URL that was crawled. Email
+ * clients, chat apps and some link parsers end a URL at punctuation, so a
+ * hyphenated slug is the one shape that reliably arrives truncated.
+ *
+ * A PREFIX, and only up to the hyphen. `startsWith(fragment + '-')` means the
+ * fragment has to end where a slug segment ends, so `/casinos/7` can reach
+ * `7-bit-casino` but `/casinos/bit` cannot reach `bitstarz` — that would be
+ * guessing at a substring rather than restoring a cut.
+ *
+ * EXACTLY ONE MATCH, or nothing. With `7-bit-casino` and a hypothetical
+ * `7-bit-casino-vip` both present, `/casinos/7` is genuinely ambiguous and a
+ * redirect would be picking one on the visitor's behalf. Ambiguity falls
+ * through to the 404, which is the honest answer.
+ *
+ * Costs nothing on the happy path: it is only reached when `getCasino()` has
+ * already failed, and `getCasinos()` is the same cached, `casinos`-tagged fetch
+ * the listing and the sitemap use.
+ */
+async function resolveTruncatedSlug(fragment: string): Promise<string | null> {
+  // A fragment that already contains a hyphen is not a cut at a segment
+  // boundary — it is just a wrong slug. Bail before spending the fetch.
+  if (fragment === '' || fragment.includes('-')) return null
+
+  try {
+    const { data: casinos } = await getCasinos()
+    const matches = casinos.filter((c) => c.slug.startsWith(`${fragment}-`))
+
+    return matches.length === 1 ? matches[0].slug : null
+  } catch {
+    // The list being unreachable must not turn a 404 into a 500.
+    return null
+  }
+}
+
 export default async function CasinoDetailPage({ params }: Props) {
   const { slug } = await params
 
@@ -99,6 +139,17 @@ export default async function CasinoDetailPage({ params }: Props) {
   try {
     casino = (await getCasino(slug)).data
   } catch {
+    /*
+     * Before 404ing, try the one recoverable case: a slug truncated at a
+     * hyphen. `permanentRedirect` is a 308, not a 301 — the App Router cannot
+     * set an arbitrary status from a page, and 308 is the permanent redirect
+     * that preserves the method. Google treats the two identically for
+     * canonicalisation, so the signal is the same one a 301 would send.
+     */
+    const real = await resolveTruncatedSlug(slug)
+
+    if (real !== null) permanentRedirect(`/casinos/${real}`)
+
     notFound()
   }
 

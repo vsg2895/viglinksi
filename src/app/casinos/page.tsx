@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import { getCategories, getCategory } from '@/lib/api'
 import {
   buildBreadcrumbSchema,
@@ -13,6 +14,7 @@ import CategoryNav from '@/components/CategoryNav'
 import Pagination from '@/components/Pagination'
 import { SITE_URL } from '@/lib/config'
 import type { Category } from '@shared/types/category'
+import { canonicalPath } from '@/lib/seo/canonical'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
 
@@ -36,30 +38,32 @@ async function resolve(searchParams: Props['searchParams']) {
  * The canonical URL for a listing view, carrying only the parameters that
  * genuinely change the content.
  */
-function canonicalPathFor(selected: string | undefined, page: number): string {
-  // Under the Option B consolidation /categories/<slug> is the canonical home of
-  // a category, and /casinos?category=<slug> 301s there (see next.config). What
-  // reaches this page is therefore only the bare /casinos, which renders the
-  // default category — so it points at that category's canonical URL rather
-  // than competing with it as a second copy of the same list.
-  //
-  // A PATH, not an absolute URL: Next resolves alternates.canonical and
-  // openGraph.url against `metadataBase`, so the host is named once (lib/config)
-  // and cannot drift per page. JSON-LD needs absolute URLs and prefixes
-  // SITE_URL at its own call site.
-  if (!selected) {
-    return '/casinos'
-  }
-
-  return `/categories/${selected}${page > 1 ? `?page=${page}` : ''}`
+function canonicalPathFor(requested: string | undefined, page: number): string {
+  /*
+   * TAKES `requested`, NOT `selected` — that distinction is the whole bug this
+   * function used to have, and `resolve()` above explains both halves of it:
+   * `selected` falls back to the first category so the page always renders
+   * something, while `requested` is what the URL actually asked for. Handed
+   * `selected`, a bare /casinos?page=2 declared itself a copy of
+   * /categories/<first-category>?page=2 — exactly what Search Console
+   * reported, and it meant this catalogue's own paginated pages were never
+   * indexed under their own URL.
+   *
+   * /casinos is the canonical UNFILTERED catalogue and self-canonicals, past
+   * page 1 included. /categories/<slug> is the canonical home of each FILTERED
+   * view, and /casinos?category=<slug> 301s there (lib/seo/redirects.ts) — so a
+   * category can never reach this page and the two routes cannot canonical at
+   * each other.
+   */
+  return requested ? canonicalPath(`/categories/${requested}`, page) : canonicalPath('/casinos', page)
 }
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
-  const { selected, page } = await resolve(searchParams)
+  const { requested, page } = await resolve(searchParams)
   // Page 2+ gets its own title so paginated views are not reported as duplicate
   // titles, and so a searcher landing on one knows where they are.
   const title = page > 1 ? `${COPY.casinos.pageTitle} — Page ${page}` : COPY.casinos.pageTitle
-  const canonical = canonicalPathFor(selected, page)
+  const canonical = canonicalPathFor(requested, page)
 
   return {
     title,
@@ -73,7 +77,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 }
 
 export default async function CasinosPage({ searchParams }: Props) {
-  const { categories, selected, page } = await resolve(searchParams)
+  const { categories, requested, selected, page } = await resolve(searchParams)
 
   if (!selected) {
     return (
@@ -87,6 +91,22 @@ export default async function CasinosPage({ searchParams }: Props) {
   }
 
   const { category, casinos, meta } = (await getCategory(selected, page)).data
+
+  /*
+   * A PAGE NUMBER PAST THE END IS NOT A PAGE.
+   *
+   * Without this, /casinos?page=999 rendered an empty list with HTTP 200 and a
+   * self-referencing canonical, so every out-of-range number any crawler ever
+   * guessed became its own indexable URL claiming to be a real page of
+   * the catalogue. Google calls that a soft 404 and reports it as an error;
+   * worse, it spends crawl budget enumerating pages that do not exist.
+   *
+   * `page > 1` is part of the test on purpose: an EMPTY listing still has a
+   * legitimate page 1 (`last_page` is 1, or 0 when the list is empty), and that
+   * page must render its empty state rather than 404 — the filters on it are
+   * the only way back.
+   */
+  if (page > 1 && page > meta.last_page) notFound()
   // Paginate on the canonical route so no internal link goes through the 301.
   const basePath = `/categories/${selected}`
   const cats = categories as Category[]
@@ -97,7 +117,7 @@ export default async function CasinosPage({ searchParams }: Props) {
     casinos.map((c, i) => ({ position: (meta.current_page - 1) * meta.per_page + i + 1, name: c.name, url: `${SITE_URL}/casinos/${c.slug}` })),
   )
 
-  const pageUrl = `${SITE_URL}${canonicalPathFor(selected, page)}`
+  const pageUrl = `${SITE_URL}${canonicalPathFor(requested, page)}`
   const graph = [
     buildWebPageSchema({
       name: COPY.casinos.pageTitle,

@@ -217,7 +217,7 @@ export default async function HomePage({ searchParams }: Props) {
             </div>
 
             {categories.length > 0 && selected && (
-              <div className="mb-8"><CategoryNav categories={categories} selected={selected} basePath="/" /></div>
+              <div className="mb-8"><CategoryNav categories={categories} selected={selected} /></div>
             )}
 
             {casinos.length === 0 ? (

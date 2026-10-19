@@ -3,16 +3,15 @@ import type { Category } from '@shared/types/category'
 
 /**
  * Viglinksi category selector — pill tabs with a gold active state.
- * Works on the home page (basePath="/") and the casinos listing.
+ * Mounted on the home page and on the casinos listing; both link at the
+ * canonical /categories/<slug> route.
  */
 export default function CategoryNav({
   categories,
   selected,
-  basePath = '/casinos',
 }: {
   categories: Category[]
   selected: string
-  basePath?: string
 }) {
   return (
     <nav aria-label="Casino categories" className="flex flex-wrap gap-3">
@@ -21,10 +20,24 @@ export default function CategoryNav({
         return (
           <Link
             key={c.id}
-            // On the home page the nav is an in-page filter (basePath="/"), so it
-            // keeps the query form. Anywhere else it links straight at the
-            // canonical category route — never through the 301.
-            href={basePath === '/' ? `/?category=${c.slug}` : `/categories/${c.slug}`}
+            /*
+             * ALWAYS the canonical category route.
+             *
+             * The home page used to take the query form `/?category=<slug>` and
+             * filter in place; `site-template` linked `/casinos?category=<slug>`,
+             * which went through a redirect. Both are now 301'd to this very URL
+             * at the edge (lib/seo/redirects.ts), so emitting either would mean
+             * linking a redirect — one wasted hop per visitor, and, multiplied by
+             * the number of categories, a page's worth of crawl budget spent on
+             * URLs that resolve elsewhere. It is also what Search Console
+             * reported as "Alternate page with proper canonical tag": the home
+             * page existed once per category, each copy canonical-tagged at `/`.
+             *
+             * The chips therefore NAVIGATE rather than filter in place. The
+             * destination renders the same list from the same endpoint, under a
+             * URL that can be linked, shared and indexed.
+             */
+            href={`/categories/${c.slug}`}
             aria-current={active ? 'page' : undefined}
             // The active chip carries a TRANSPARENT border purely so its box model
             // matches the inactive ones, which are bordered. Without it the selected

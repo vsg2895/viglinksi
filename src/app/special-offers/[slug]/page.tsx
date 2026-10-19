@@ -33,17 +33,45 @@ type Props = { params: Promise<{ slug: string }> }
  * existing per-fetch cache and its tags exactly as they were.
  */
 
+/**
+ * The offer's own prose, as plain text — the field an editor actually writes.
+ *
+ * Measured on the live data before this existed: 18 of 29 offers carry no
+ * `bonuses` value, and `bonuses` is a column on the GLOBAL `special_offers`
+ * row — identical across every domain in the network, with only 8 distinct
+ * values across 29 offers. Composed from it, every thin offer's meta
+ * description came out as its title plus one sentence repeated on every sibling
+ * page. `description` is the only one of the three that is unique per offer.
+ */
+function plainDescription(html: string | null | undefined): string {
+  return (html ?? '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
+
+/** Trimmed at a word boundary to the ~155 characters Google renders. */
+function metaLength(text: string): string {
+  return text.length <= 155 ? text : `${text.slice(0, 155).replace(/\s+\S*$/, '')}…`
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   try {
     const { data: offer } = await getSpecialOffer(slug)
     const title = offer.title
-    // `bonuses` is shared master data, identical on every site — so the site's
-    // own line is appended to keep the factual bonus lead while making the
-    // description unique per domain.
-    const description = offer.bonuses
-      ? `${offer.bonuses} — ${COPY.specialOffers.offerMetaSuffix}`
-      : `${offer.title} — ${COPY.specialOffers.offerMetaSuffix}`
+    /*
+     * The written description first; the `bonuses` composition only as a
+     * fallback for an offer nobody has written up yet — a content gap this file
+     * cannot close, not something to paper over with longer boilerplate.
+     */
+    const prose = plainDescription(offer.description)
+    const description = prose !== ''
+      ? metaLength(prose)
+      : offer.bonuses
+        ? `${offer.bonuses} — ${COPY.specialOffers.offerMetaSuffix}`
+        : `${offer.title} — ${COPY.specialOffers.offerMetaSuffix}`
     return {
       title,
       description,
@@ -53,7 +81,29 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       // but it must never enter the index. It is already absent from every
       // listing and from the sitemap; this stops a crawler that finds the URL
       // some other way (a shared link, a referrer) from indexing it.
-      ...(offer.active ? {} : { robots: { index: false, follow: false } }),
+      /*
+       * TWO distinct gates.
+       *
+       * `!active` is the hard one: the offer is withdrawn, the page exists only
+       * so an old link does not 404, and `follow: false` keeps it from passing
+       * anything onward.
+       *
+       * `is_indexable` is the editorial one, computed on the server from this
+       * offer alone (SpecialOffer::isIndexable): at least ~80 words of
+       * description OR filled bonus terms, and no explicit admin noindex. It
+       * exists because the median offer description was 33 words and Search
+       * Console reported such pages as "Crawled — currently not indexed" —
+       * Google's verdict was right, and asking it again on every crawl spends
+       * budget the finished offers need. `follow` stays true: the casino and
+       * category links on a thin page are still worth following.
+       *
+       * The same flag filters the sitemap, so the two can never disagree.
+       */
+      ...(!offer.active
+        ? { robots: { index: false, follow: false } }
+        : offer.is_indexable === false
+          ? { robots: { index: false, follow: true } }
+          : {}),
     }
   } catch {
     return { title: COPY.errors.notFound }
@@ -80,15 +130,47 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
     ],
     pageUrl,
   )
+  /*
+   * `Offer`, and deliberately NOT `SpecialAnnouncement`.
+   *
+   * SpecialAnnouncement is scoped to public-health and emergency notices;
+   * applying it to a casino bonus is schema misuse that risks a manual action
+   * rather than a rich result. `Offer` is the type that describes a promotion.
+   *
+   * ONLY FIELDS WE ACTUALLY HOLD. No `price`, no `priceCurrency`, no
+   * `availabilityEnds` — this API exposes none of them, and an Offer carrying an
+   * invented figure is worse than no Offer at all. `bonuses` gets no property of
+   * its own either: it reads like "100% up to €500", and the Offer properties
+   * that take a figure expect a number or a PriceSpecification, not a sentence.
+   */
+  const offerProse = plainDescription(offer.description)
+  const offerSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Offer',
+    name: offer.title,
+    url: pageUrl,
+    ...(offerProse !== ''
+      ? { description: offerProse }
+      : offer.bonuses
+        ? { description: offer.bonuses }
+        : {}),
+    ...(offer.casino?.name
+      ? { offeredBy: { '@type': 'Organization', name: offer.casino.name } }
+      : {}),
+    ...(offer.bonus_category_name ? { category: offer.bonus_category_name } : {}),
+  }
+
   const graph = [
     buildWebPageSchema({
       name: offer.title,
       url: pageUrl,
-      description: offer.bonuses ?? undefined,
+      // The prose, not the shared `bonuses` line that is identical network-wide.
+      description: offerProse !== '' ? offerProse : (offer.bonuses ?? undefined),
       breadcrumbId: breadcrumbIdFor(pageUrl),
       dateModified: offer.updated_at,
     }),
     breadcrumb,
+    offerSchema,
   ]
 
   return (
