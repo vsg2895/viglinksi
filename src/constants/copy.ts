@@ -46,10 +46,21 @@ export const COPY = {
     categories: 'Categories',
   },
   home: {
-    // The chip row at the top of the page. No visible heading — the chips say
-    // what they are — so this exists for screen readers, which otherwise meet
-    // an unnamed navigation landmark between the hero and the casino list.
-    bonusTypesLabel: 'Bonus types',
+    /**
+     * The VISIBLE heading over the bonus-type row.
+     *
+     * The row used to carry no heading at all — the chips were taken to
+     * speak for themselves. They do not: arriving mid-page at a band of
+     * unlabelled buttons between the hero and the casino list, there is
+     * nothing saying what the set IS, and nothing a screen reader can
+     * announce for the landmark beyond a generic label nobody wrote for
+     * this page.
+     *
+     * Worded differently on every domain, like every other <h2> here:
+     * eleven sites serve one catalogue, and a shared heading is
+     * duplicate content.
+     */
+    bonusTypesTitle: 'Bonus Categories',
     heroEyebrow: 'The Audit Desk',
     // Split in two so the JSX keeps its emphasised <em> while the words change.
     heroHeadline: 'Casino reviews that read',
