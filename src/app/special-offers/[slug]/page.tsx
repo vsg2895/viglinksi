@@ -5,6 +5,8 @@ import { notFound } from 'next/navigation'
 import { getSpecialOffer } from '@/lib/api'
 import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
+import BonusTerms from '@/components/BonusTerms'
+import { CLAIMABLE_BONUS_CATEGORY } from '@/components/SpecialOfferCard'
 import { COPY } from '@/constants/copy'
 import { SITE_URL } from '@/lib/config'
 
@@ -121,6 +123,8 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
   }
 
   const banner = resolveImageUrl(offer.banner_image ?? offer.image_path)
+  // The same rule the cards use: Claim is a property of the bonus TYPE.
+  const claimable = offer.bonus_category_slug === CLAIMABLE_BONUS_CATEGORY
   const pageUrl = `${SITE_URL}/special-offers/${slug}`
   const breadcrumb = buildBreadcrumbSchema(
     [
@@ -178,7 +182,12 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
 
       <main className="py-12 px-4">
-        <div className="container mx-auto max-w-3xl">
+        {/* A WIDER MEASURE than the 3xl column this page used to be, because
+            the page now has two things to hold: the sales prose and a rail of
+            terms. At 3xl the rail had nowhere to go and the wagering
+            requirement sat below the description, which is past the point most
+            readers stop. */}
+        <div className="container mx-auto max-w-[90rem]">
           <nav className="mb-6 text-sm text-faint">
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
           </nav>
@@ -186,7 +195,7 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
           {/* The artwork alone — NO shared backdrop here, deliberately.
               The backdrop exists to make a GRID of bonus cards read as one set;
               this page shows a single bonus at full width, where there is no set
-              to belong to and the gold ground would only compete with the
+              to belong to and the patterned ground would only compete with the
               artwork it sits behind. `object-contain` stays: nothing is cropped
               off the edges of a banner meant to be read whole. */}
           {banner && (
@@ -195,32 +204,90 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
                 src={banner}
                 alt={offer.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 768px"
+                sizes="(max-width: 1024px) 100vw, 1440px"
                 priority
                 className="object-contain object-center"
               />
             </div>
           )}
 
-          <h1 className="text-3xl font-bold text-ink">{offer.title}</h1>
-          <p className="mt-1 text-gold" aria-label={`${offer.rating} out of 5`}>{'★'.repeat(offer.rating)}{'☆'.repeat(5 - offer.rating)}</p>
-          {offer.bonuses && <p className="mt-4 rounded-xl bg-win-bg px-4 py-3 text-lg font-semibold text-win">{offer.bonuses}</p>}
+          {/* Title and rating on the left, the bonus figure and the CTA on the
+              right: the two things a visitor came for, both above the fold on a
+              desktop. Stacks in source order on a phone, where "what is it"
+              still reads before "claim it". */}
+          <header className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-ink lg:text-4xl">{offer.title}</h1>
+              <p className="mt-1 text-gold" aria-label={`${offer.rating} out of 5`}>{'★'.repeat(offer.rating)}{'☆'.repeat(5 - offer.rating)}</p>
+            </div>
 
-          {offer.affiliate_url && (
-            <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="mt-6 inline-block rounded-xl bg-brand px-8 py-3.5 font-semibold text-black hover:bg-brand-dark transition-colors">
-              {COPY.specialOffers.claim}
-            </a>
-          )}
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center lg:justify-end">
+              {offer.bonuses && <p className="rounded-xl bg-win-bg px-4 py-3 text-lg font-semibold text-win">{offer.bonuses}</p>}
 
-          {offer.description && (
-            <div className="prose prose-invert mt-8 max-w-none" dangerouslySetInnerHTML={{ __html: offer.description }} />
-          )}
+              {/* An EXPIRED offer keeps its page — the URL stays valid and the
+                  terms stay readable — but it must never be presented as
+                  claimable. The CTA is replaced with a plain statement rather
+                  than removed silently, so a visitor who followed an old link
+                  understands why there is nothing to press. Expired offers are
+                  already absent from every listing; only a direct link reaches
+                  this. */}
+              {offer.terms?.expired ? (
+                <p className="rounded-xl border border-line bg-paper px-4 py-3 text-sm font-medium text-ink-soft">
+                  This offer ended
+                  {offer.terms.expires_at ? (
+                    <> on <time dateTime={offer.terms.expires_at}>{offer.terms.expires_at}</time></>
+                  ) : null}
+                  . It is no longer available to claim.{' '}
+                  <Link href="/special-offers" className="underline underline-offset-4 hover:text-brand">
+                    See current offers
+                  </Link>
+                </p>
+              ) : (
+                // Claim belongs to the Special Offers bonus type, matching the
+                // cards — see CLAIMABLE_BONUS_CATEGORY in SpecialOfferCard. A
+                // bonus of another type still shows its terms and its operator
+                // link in the rail below; what it does not show is a Claim
+                // button, which on these sites means "this is a Special Offer".
+                claimable && offer.affiliate_url && (
+                  <a href={offer.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-xl bg-brand px-8 py-3.5 font-semibold text-black hover:bg-brand-dark transition-colors">
+                    {COPY.specialOffers.claim}
+                  </a>
+                )
+              )}
+            </div>
+          </header>
 
-          {offer.casino && (
-            <p className="mt-8 text-sm text-muted">
-              Offer by <Link href={`/casinos/${offer.casino.slug}`} className="font-semibold text-brand hover:underline">{offer.casino.name}</Link>
-            </p>
-          )}
+          <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_24rem] lg:gap-10 xl:grid-cols-[minmax(0,1fr)_26rem]">
+            {/* The rail: terms and the operator link. FIRST IN SOURCE so the
+                wagering requirement is read before the sales copy on a phone;
+                `lg:order-2` moves it beside the description on a desktop. That
+                order is the whole point of the change — the terms used to sit
+                below the prose, where a reader deciding whether to deposit had
+                already stopped reading. */}
+            {(offer.terms || offer.casino) && (
+              <aside className="lg:order-2 lg:sticky lg:top-24 lg:self-start [&>section]:mt-0 lg:[&_dl]:grid-cols-2">
+                {offer.terms && <BonusTerms terms={offer.terms} />}
+
+                {/* A card, not a bare line: with no terms to show this is the
+                    whole rail, and a lone sentence beside a column of prose
+                    reads as a mistake. */}
+                {offer.casino && (
+                  <div className={`rounded-xl border border-line bg-paper p-5 text-sm text-muted ${offer.terms ? 'mt-4' : ''}`}>
+                    <p>
+                      Offer by <Link href={`/casinos/${offer.casino.slug}`} className="font-semibold text-brand hover:underline">{offer.casino.name}</Link>
+                    </p>
+                    <Link href={`/casinos/${offer.casino.slug}`} className="mt-3 inline-flex min-h-11 items-center font-semibold text-brand underline underline-offset-4 hover:text-brand-dark">
+                      Read the full review →
+                    </Link>
+                  </div>
+                )}
+              </aside>
+            )}
+
+            {offer.description && (
+              <div className="prose prose-invert min-w-0 max-w-none lg:order-1 lg:prose-lg" dangerouslySetInnerHTML={{ __html: offer.description }} />
+            )}
+          </div>
         </div>
       </main>
     </>
