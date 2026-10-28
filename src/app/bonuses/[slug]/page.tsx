@@ -127,9 +127,9 @@ export default async function BonusCategoryPage({ params, searchParams }: Props)
 
       {/* The same measure, grid and card as /special-offers, so arriving here
           from a chip is that listing narrowed rather than a different page. */}
-      <main className="py-12 px-4">
+      <main className="py-6 px-4 sm:py-12">
         <div className="container mx-auto max-w-5xl">
-          <nav className="mb-6 text-sm text-faint">
+          <nav className="mb-3 text-sm sm:mb-6 text-faint">
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link>
             {' / '}
             <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">{COPY.nav.specialOffers}</Link>
@@ -137,9 +137,9 @@ export default async function BonusCategoryPage({ params, searchParams }: Props)
             <span className="text-ink">{category.name}</span>
           </nav>
 
-          <header className="mb-8">
-            <h1 className="text-3xl font-bold text-ink">{category.name}</h1>
-            {category.description && <p className="mt-2 text-muted">{category.description}</p>}
+          <header className="mb-4 sm:mb-8">
+            <h1 className="text-2xl font-bold sm:text-3xl text-ink">{category.name}</h1>
+            {category.description && <p className="mt-1 text-sm text-muted sm:mt-2 sm:text-base">{category.description}</p>}
             {/* The count is what lets a reader trust the paginator: it says how
                 much is behind these cards. */}
             {meta.total > 0 && (
@@ -152,7 +152,7 @@ export default async function BonusCategoryPage({ params, searchParams }: Props)
           {offers.length === 0 ? (
             <p className="text-muted">{COPY.specialOffers.noResults}</p>
           ) : (
-            <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-10 lg:grid-cols-3">
               {offers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
             </div>
           )}

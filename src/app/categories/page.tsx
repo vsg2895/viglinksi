@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { resolveImageUrl } from '@/lib/images'
 import { getCategories } from '@/lib/api'
 import {
   buildBreadcrumbSchema,
@@ -60,20 +61,26 @@ export default async function CategoriesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
-      <main className="py-12 px-4">
+      <main className="py-6 px-4 sm:py-12">
       <div className="container mx-auto max-w-5xl">
-        <header className="mb-8">
-          <h1 className="text-3xl font-bold text-ink">{COPY.categories.pageTitle}</h1>
-          <p className="mt-2 text-muted">{COPY.categories.pageDescription}</p>
+        <header className="mb-4 sm:mb-8">
+          <h1 className="text-2xl font-bold sm:text-3xl text-ink">{COPY.categories.pageTitle}</h1>
+          <p className="mt-1 text-sm text-muted sm:mt-2 sm:text-base">{COPY.categories.pageDescription}</p>
         </header>
         {categories.length === 0 ? (
           <p className="text-muted">{COPY.categories.noResults}</p>
         ) : (
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {categories.map((c) => (
               <li key={c.id}>
-                <Link href={`/categories/${c.slug}`} className="block rounded-2xl border border-line bg-paper p-6 text-center font-semibold text-ink shadow-sm hover:border-brand hover:text-brand transition-colors">
-                  {c.name}
+                <Link href={`/categories/${c.slug}`} className="block rounded-2xl border border-line bg-paper p-4 sm:p-6 text-center font-semibold text-ink shadow-sm hover:border-brand hover:text-brand transition-colors">
+                  {/* Icon beside the name, as on the chips and in the Casinos menu. */}
+                  <span className="inline-flex items-center justify-center gap-2">
+                    {c.logo_path && (
+                      <img src={resolveImageUrl(c.logo_path)!} alt="" width={20} height={20} className="h-5 w-5 shrink-0" />
+                    )}
+                    {c.name}
+                  </span>
                 </Link>
               </li>
             ))}

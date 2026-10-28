@@ -81,9 +81,9 @@ export default async function CasinosPage({ searchParams }: Props) {
 
   if (!selected) {
     return (
-      <main className="px-4 py-16">
+      <main className="px-4 py-6 sm:py-16">
         <div className="container mx-auto max-w-5xl">
-          <h1 className="font-display text-4xl font-semibold text-ink">{COPY.casinos.pageTitle}</h1>
+          <h1 className="font-display text-2xl sm:text-4xl font-semibold text-ink">{COPY.casinos.pageTitle}</h1>
           <p className="mt-4 text-muted">{COPY.casinos.noResults}</p>
         </div>
       </main>
@@ -142,18 +142,18 @@ export default async function CasinosPage({ searchParams }: Props) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
-      <main className="px-4 py-16">
+      <main className="px-4 py-6 sm:py-16">
         <div className="container mx-auto max-w-5xl">
-          <header className="mb-8">
-            <h1 className="font-display text-4xl font-semibold text-ink">{COPY.casinos.pageTitle}</h1>
-            <p className="mt-2 text-muted">{COPY.casinos.pageDescription}</p>
+          <header className="mb-4 sm:mb-8">
+            <h1 className="font-display text-2xl sm:text-4xl font-semibold text-ink">{COPY.casinos.pageTitle}</h1>
+            <p className="mt-1 text-sm text-muted sm:mt-2 sm:text-base">{COPY.casinos.pageDescription}</p>
           </header>
 
           {/* Category menu — top of the casinos list */}
-          <div className="mb-8"><CategoryNav categories={cats} selected={selected} /></div>
+          <div className="mb-5 sm:mb-8"><CategoryNav categories={cats} selected={selected} /></div>
 
           <div className="mb-4 flex items-baseline justify-between">
-            <h2 className="font-display text-2xl font-semibold text-ink">{category.name}</h2>
+            <h2 className="font-display text-xl sm:text-2xl font-semibold text-ink">{category.name}</h2>
             <span className="text-sm text-faint">{meta.total} casinos</span>
           </div>
 

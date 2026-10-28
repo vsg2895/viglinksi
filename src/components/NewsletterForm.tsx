@@ -62,7 +62,7 @@ export default function NewsletterForm() {
   return (
     <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
       <div>
-        <p className="font-display text-lg font-semibold text-ink">{COPY.newsletter.title}</p>
+        <p className="font-display text-base font-semibold text-ink sm:text-lg">{COPY.newsletter.title}</p>
         <p className="mt-0.5 text-sm text-muted">{COPY.newsletter.subtitle}</p>
       </div>
 
