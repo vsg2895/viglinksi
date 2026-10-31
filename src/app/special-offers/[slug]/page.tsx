@@ -177,13 +177,13 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
 
-      <main className="py-12 px-4">
+      <main className="py-12 px-4 sm:px-6 lg:px-8">
         {/* A WIDER MEASURE than the 3xl column this page used to be, because
             the page now has two things to hold: the sales prose and a rail of
             terms. At 3xl the rail had nowhere to go and the wagering
             requirement sat below the description, which is past the point most
             readers stop. */}
-        <div className="container mx-auto max-w-[90rem]">
+        <div className="mx-auto max-w-[90rem]">
           <nav className="mb-6 text-sm text-faint">
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/special-offers" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Special Offers</Link> / <span className="text-ink-soft">{offer.title}</span>
           </nav>

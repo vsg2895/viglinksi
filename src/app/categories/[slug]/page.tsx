@@ -62,12 +62,22 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
     const description = `${data.category.name} casinos — ${COPY.categories.categoryMetaSuffix}`
     const canonical = canonicalPathFor(slug, page)
 
+    /*
+     * An EMPTY category is `noindex, follow`, and the sitemap leaves it out
+     * (`casinos_count > 0` in sitemap.ts). A page saying "no casinos" that still
+     * asked to be indexed is what Google files as a soft 404. Driven by the
+     * data: attaching a casino makes it indexable on the next regeneration.
+     * Past-the-end pages never get here: they 404.
+     */
+    const isEmpty = data.casinos.length === 0
+
     return {
       title,
       description,
       // Self-referencing canonical: this route is now the canonical home of a
       // category, and /casinos?category=<slug> 301s here (see next.config).
       alternates: { canonical },
+      ...(isEmpty ? { robots: { index: false, follow: true } } : {}),
       openGraph: { type: 'website', url: canonical, siteName: SITE_NAME, title, description },
     }
   } catch {

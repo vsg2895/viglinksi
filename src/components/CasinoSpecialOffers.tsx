@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { resolveImageUrl } from '@/lib/images'
+import OfferBanner from '@/components/OfferBanner'
 import { COPY } from '@/constants/copy'
 import type { SpecialOffer } from '@shared/types/specialOffer'
 
@@ -72,16 +72,12 @@ export default function CasinoSpecialOffers({ offers }: { offers: SpecialOffer[]
               href={`/special-offers/${offer.slug}`}
               className="group flex gap-4 rounded-xl border border-line bg-paper p-4 transition-colors hover:border-brand hover:bg-brand/5"
             >
-              {thumb && (
-                <Image
-                  src={thumb}
-                  alt={offer.title}
-                  width={112}
-                  height={64}
-                  sizes="112px"
-                  className="h-16 w-28 shrink-0 rounded-lg bg-cream object-contain object-center p-1"
-                />
-              )}
+              {/* The same frame the bonus cards use — see OfferBanner. Rendered
+                  unconditionally: the backdrop IS the frame, so an offer still waiting
+                  for its artwork keeps its place in the row. */}
+              <span className="relative block h-16 w-28 shrink-0 overflow-hidden rounded-lg">
+                <OfferBanner src={thumb} alt={offer.title} sizes="112px" />
+              </span>
               <span className="min-w-0">
                 {/* The bonus TYPE, as the editor named it.
                     An eyebrow rather than a line under the title: the title is

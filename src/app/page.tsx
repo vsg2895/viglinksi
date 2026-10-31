@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getBonusArea, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
 import type { BonusSection } from '@/lib/api'
@@ -31,7 +32,7 @@ function faqSpan(i: number): string {
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
 const YEAR = new Date().getFullYear()
 
-type Props = { searchParams: Promise<{ category?: string }> }
+type Props = { searchParams: Promise<{ category?: string; page?: string }> }
 
 // Resolve the selected category (default = first/highest-priority) for the home casinos section.
 async function resolveCategory(searchParams: Props['searchParams']) {
@@ -55,6 +56,17 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage({ searchParams }: Props) {
+  /*
+   * THE HOME PAGE HAS ONE PAGE, so `?page=2` is a page past the end.
+   *
+   * Nothing here is paginated (the full list is /casinos), yet `/?page=2` and
+   * every other number a crawler guessed answered 200 with the whole home page
+   * and an `index` robots tag: a duplicate of `/` at a URL of its own. A 404
+   * says it is not a page at all, the rule every paginated listing here applies
+   * past its last page. `?page=1` never reaches this: proxy.ts 301s it to `/`.
+   */
+  if (Math.max(1, Number((await searchParams).page) || 1) > 1) notFound()
+
   const { categories, selected } = await resolveCategory(searchParams)
 
   const [categoryRes, offersRes, anyOffersRes, bonusRes] = await Promise.allSettled([

@@ -31,7 +31,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         }))
       : []
 
-  const categories = categoriesRes.status === 'fulfilled' ? categoriesRes.value.data : []
+  // An empty category is noindex (see categories/[slug]), so it is not submitted.
+  const categories =
+    categoriesRes.status === 'fulfilled' ? categoriesRes.value.data.filter((c) => (c.casinos_count ?? 0) > 0) : []
 
   const categoryUrls: MetadataRoute.Sitemap = categories.map((c) => ({
     url: `${SITE_URL}/categories/${c.slug}`,
@@ -97,13 +99,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           }))
       : []
 
-  // NOTE — /casinos is deliberately absent. Under the Option B consolidation it
-  // canonicalises to /categories/<first-category> (see casinos/page.tsx), and a
-  // sitemap should only advertise canonical URLs; listing it asked Google to
-  // index a page that immediately points somewhere else. It stays crawlable
-  // through the header nav, and every category it can show is listed below.
+  // /casinos is the unfiltered catalogue and canonicals to itself (see
+  // casinos/page.tsx), so it is listed like on every other site. It was once
+  // left out because it canonicalised to /categories/<first-category>; that
+  // consolidation was undone, and an indexable page missing from the sitemap
+  // is the signal that went stale with it.
   const staticUrls: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
+    { url: `${SITE_URL}/casinos`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${SITE_URL}/special-offers`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${SITE_URL}/categories`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.7 },
   ]
