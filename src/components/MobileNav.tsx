@@ -75,6 +75,7 @@ export default function MobileNav({
   const panelId = `mobile-nav-${useId()}`
   const trigger = useRef<HTMLButtonElement>(null)
   const panel = useRef<HTMLDivElement>(null)
+  const backdrop = useRef<HTMLDivElement>(null)
 
   const close = () => {
     setOpenOn(null)
@@ -90,6 +91,11 @@ export default function MobileNav({
     const place = () => {
       const bottom = button.closest('header')?.getBoundingClientRect().bottom ?? 64
       el.style.top = `${bottom}px`
+      // The dimmed backdrop starts there too. Spanning the whole screen, it
+      // sat over the header and blurred the close button the comment on the
+      // panel promises stays put — the control was still tappable through it,
+      // but it looked disabled.
+      if (backdrop.current) backdrop.current.style.top = `${bottom}px`
       // As tall as its content, never taller than the space below the header:
       // a short menu leaves the dimmed page visible, a long one scrolls.
       el.style.maxHeight = `calc(100dvh - ${bottom}px)`
@@ -158,8 +164,12 @@ export default function MobileNav({
 
       {open &&
         createPortal(
-          <div className="fixed inset-0 z-50 md:hidden" role="presentation">
-            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-hidden onClick={close} />
+          // NOT `inset-0`: the layer would sit over the header (z-50 above its
+          // z-40) and swallow taps on the close button. It covers only what is
+          // below the header; `pointer-events-none` on the layer itself lets
+          // the header above stay live while the panel and backdrop take theirs.
+          <div className="pointer-events-none fixed inset-0 z-50 md:hidden [&>*]:pointer-events-auto" role="presentation">
+            <div ref={backdrop} className="absolute inset-x-0 bottom-0 top-16 bg-black/40 backdrop-blur-sm" aria-hidden onClick={close} />
 
             <div
               ref={panel}
