@@ -225,7 +225,8 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
           }}
         />
         <header className="sticky top-0 z-40 border-b border-line bg-cream/90 backdrop-blur-xl">
-          <div className="container mx-auto max-w-6xl px-4 h-16 flex items-center justify-between gap-4">
+          {/* gap-2 below 360px: at 320 the logo and the burger needed 3px more than the row had. */}
+          <div className="container mx-auto max-w-6xl px-4 h-16 flex items-center justify-between gap-4 max-[359px]:gap-2">
             <Logo />
             <nav aria-label="Main navigation" className="hidden md:block no-scrollbar -mr-4 min-w-0 overflow-x-auto pr-4">
               <ul className="flex items-center gap-0.5 sm:gap-1" role="list">

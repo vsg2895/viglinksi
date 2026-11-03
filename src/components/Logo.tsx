@@ -40,7 +40,9 @@ export default function Logo({ className = '' }: { className?: string }) {
         <span className="font-sans text-[22px] font-bold tracking-tight text-ink">
           Vig<span className="text-brand">linksi</span>
         </span>
-        <span className="mt-[3px] text-xs font-medium tracking-[0.18em] text-faint">
+        {/* The tagline's tracking sets the logo's width; tighter below 360px so
+            the burger keeps the header's 16px side padding at 320. */}
+        <span className="mt-[3px] text-xs font-medium tracking-[0.18em] max-[359px]:tracking-[0.08em] text-faint">
           CASINO INTELLIGENCE
         </span>
       </span>

@@ -70,10 +70,10 @@ export default async function CategoriesPage() {
         {categories.length === 0 ? (
           <p className="text-muted">{COPY.categories.noResults}</p>
         ) : (
-          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+          <ul className="grid auto-rows-fr grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
             {categories.map((c) => (
               <li key={c.id}>
-                <Link href={`/categories/${c.slug}`} className="block rounded-2xl border border-line bg-paper p-4 sm:p-6 text-center font-semibold text-ink shadow-sm hover:border-brand hover:text-brand transition-colors">
+                <Link href={`/categories/${c.slug}`} className="flex h-full items-center justify-center rounded-2xl border border-line bg-paper p-4 sm:p-6 text-center font-semibold text-ink shadow-sm hover:border-brand hover:text-brand transition-colors">
                   {/* Icon beside the name, as on the chips and in the Casinos menu. */}
                   <span className="inline-flex items-center justify-center gap-2">
                     {c.logo_path && (
