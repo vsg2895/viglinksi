@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, permanentRedirect } from 'next/navigation'
 import { getCasinos, getCasino } from '@/lib/api'
-import { buildCasinoReviewSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
+import { buildCasinoReviewSchema, buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
 import CasinoSpecialOffers from '@/components/CasinoSpecialOffers'
 import CasinoReviews from '@/components/CasinoReviews'
@@ -75,7 +75,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         siteName: SITE_NAME,
         title: shareTitle,
         description,
-        ...(images ? { images } : {}),
+        // No banner and no logo: the site card, not an image-less large card.
+        images: images ?? SHARE_IMAGES,
       },
       // twitter: was set site-wide but never per review, so X rendered the
       // generic card for every casino.
@@ -83,7 +84,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         card: 'summary_large_image',
         title: shareTitle,
         description,
-        ...(shareImage ? { images: [shareImage] } : {}),
+        images: shareImage ? [shareImage] : SHARE_IMAGES,
       },
     }
   } catch {

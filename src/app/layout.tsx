@@ -8,7 +8,7 @@ import ToastProvider from '@/components/ToastProvider'
 import CookieSettingsButton from '@/components/CookieSettingsButton'
 import Logo from '@/components/Logo'
 import { getSocialLinks, hasSpecialOffers, getCategories, getBonusArea } from '@/lib/api'
-import { buildOrganizationSchema, buildWebSiteSchema, jsonLdScript } from '@/lib/seo'
+import { buildOrganizationSchema, buildWebSiteSchema, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
 import { SITE_URL } from '@/lib/config'
 import { COPY } from '@/constants/copy'
 import NavDropdown from '@/components/NavDropdown'
@@ -90,8 +90,13 @@ export const metadata: Metadata = {
     // Relative on purpose: Next resolves it against metadataBase, so og:url
     // and the canonical can never disagree about the host.
     url: '/',
+    images: SHARE_IMAGES,
   },
-  twitter: { card: 'summary_large_image', title: SITE_TITLE, description: SITE_DESCRIPTION },
+  // The card TYPE only. A title and description here were inherited by every
+  // page that does not set `twitter` itself — nearly all of them — so a shared
+  // /casinos or /about went out on X under the HOME page's title. With these
+  // tags absent, X reads the page's own og:title, og:description and og:image.
+  twitter: { card: 'summary_large_image' },
   robots: { index: true, follow: true },
   manifest: '/manifest.webmanifest',
   authors: [{ name: SITE_NAME, url: SITE_URL }],

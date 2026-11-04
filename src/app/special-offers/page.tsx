@@ -6,6 +6,7 @@ import {
   buildWebPageSchema,
   breadcrumbIdFor,
   jsonLdScript,
+  SHARE_IMAGES,
 } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import SpecialOfferCard from '@/components/SpecialOfferCard'
@@ -18,7 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: COPY.specialOffers.pageTitle,
     description: COPY.specialOffers.pageDescription,
     alternates: { canonical: `/special-offers` },
-    openGraph: { type: 'website', url: `/special-offers`, siteName: SITE_NAME, title: COPY.specialOffers.pageTitle, description: COPY.specialOffers.pageDescription },
+    openGraph: { type: 'website', url: `/special-offers`, siteName: SITE_NAME, title: COPY.specialOffers.pageTitle, description: COPY.specialOffers.pageDescription, images: SHARE_IMAGES },
   }
 }
 

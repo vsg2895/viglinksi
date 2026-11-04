@@ -14,6 +14,12 @@ import { COPY } from '@/constants/copy'
 export const metadata: Metadata = {
   title: 'Page not found',
   robots: { index: false, follow: true },
+  // Cleared, not inherited: the root layout's defaults are the HOMEPAGE's
+  // canonical, og:url and share card, so every 404 declared itself a copy of
+  // the home page. A missing URL has no canonical and nothing to share.
+  alternates: { canonical: null },
+  openGraph: null,
+  twitter: null,
 }
 
 const LINKS = [

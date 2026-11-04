@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getBonusArea, getCategories, getCategory, getSpecialOffers } from '@/lib/api'
 import type { BonusSection } from '@/lib/api'
-import { buildItemListSchema, buildWebPageSchema, jsonLdScript, buildFaqSchema } from '@/lib/seo'
+import { buildItemListSchema, buildWebPageSchema, jsonLdScript, buildFaqSchema, SHARE_IMAGES } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import { FAQ_ITEMS } from '@/constants/faq'
 import CasinoCard from '@/components/CasinoCard'
@@ -50,8 +50,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: '/' },
-    openGraph: { type: 'website', url: '/', siteName: SITE_NAME, title, description },
-    twitter: { card: 'summary_large_image', title, description },
+    openGraph: { type: 'website', url: '/', siteName: SITE_NAME, title, description, images: SHARE_IMAGES },
+    twitter: { card: 'summary_large_image', title, description, images: SHARE_IMAGES },
   }
 }
 

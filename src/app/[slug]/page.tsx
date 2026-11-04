@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getPage } from '@/lib/api'
 import { LEGAL_PAGES } from '@/constants/legalPages'
-import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
+import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
 import { SITE_URL } from '@/lib/config'
 
 // The known legal slugs are pre-rendered; any OTHER published CMS page renders
@@ -14,6 +14,13 @@ export const dynamicParams = true
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
 
 type Props = { params: Promise<{ slug: string }> }
+
+// The two standard pages that have a schema.org type of their own. Every other
+// CMS page — legal or bespoke — stays a plain WebPage.
+const PAGE_TYPES: Record<string, 'AboutPage' | 'ContactPage'> = {
+  about: 'AboutPage',
+  contact: 'ContactPage',
+}
 
 export function generateStaticParams(): Array<{ slug: string }> {
   return LEGAL_PAGES.map((p) => ({ slug: p.slug }))
@@ -39,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: { absolute: title },
     description: page.meta_description ?? undefined,
     alternates: { canonical: `/${slug}` },
-    openGraph: { type: 'article', url: `/${slug}`, siteName: SITE_NAME, title: headline, description: page.meta_description ?? undefined },
+    openGraph: { type: 'article', url: `/${slug}`, siteName: SITE_NAME, title: headline, description: page.meta_description ?? undefined, images: SHARE_IMAGES },
     /*
      * FROM THE API, not from a list in this file.
      *
@@ -76,6 +83,10 @@ export default async function LegalPage({ params }: Props) {
   if (!page) notFound()
 
   const label = LEGAL_PAGES.find((p) => p.slug === slug)?.label ?? page.title
+  // UTC, so the build server's zone cannot move the date a day either way.
+  const updated = page.updated_at
+    ? new Date(page.updated_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    : null
   const pageUrl = `${SITE_URL}/${slug}`
   const breadcrumb = buildBreadcrumbSchema(
     [
@@ -91,6 +102,7 @@ export default async function LegalPage({ params }: Props) {
       description: page.meta_description ?? undefined,
       breadcrumbId: breadcrumbIdFor(pageUrl),
       dateModified: page.updated_at,
+      type: PAGE_TYPES[slug] ?? 'WebPage',
     }),
     breadcrumb,
   ]
@@ -106,6 +118,14 @@ export default async function LegalPage({ params }: Props) {
           </nav>
 
           <h1 className="text-3xl font-bold text-ink">{page.title}</h1>
+          {/* The date a policy last changed is part of the policy: "review it
+              periodically" means nothing without one. The same value is the
+              WebPage's dateModified above, so the page and its markup agree. */}
+          {updated && (
+            <p className="mt-3 text-sm text-faint">
+              Last updated <time dateTime={page.updated_at}>{updated}</time>
+            </p>
+          )}
 
           <article
             className="prose prose-invert mt-8 max-w-none prose-headings:font-bold prose-a:text-brand"

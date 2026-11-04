@@ -7,6 +7,7 @@ import {
   buildWebPageSchema,
   breadcrumbIdFor,
   jsonLdScript,
+  SHARE_IMAGES,
 } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import CasinoCard from '@/components/CasinoCard'
@@ -72,7 +73,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     // behaviour) tells Google the deeper pages are duplicates of the first, so
     // the casinos listed only on those pages never get indexed.
     alternates: { canonical },
-    openGraph: { type: 'website', url: canonical, siteName: SITE_NAME, title, description: COPY.casinos.pageDescription },
+    openGraph: { type: 'website', url: canonical, siteName: SITE_NAME, title, description: COPY.casinos.pageDescription, images: SHARE_IMAGES },
   }
 }
 

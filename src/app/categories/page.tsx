@@ -8,6 +8,7 @@ import {
   buildWebPageSchema,
   breadcrumbIdFor,
   jsonLdScript,
+  SHARE_IMAGES,
 } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import { SITE_URL } from '@/lib/config'
@@ -19,7 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: COPY.categories.pageTitle,
     description: COPY.categories.pageDescription,
     alternates: { canonical: `/categories` },
-    openGraph: { type: 'website', url: `/categories`, siteName: SITE_NAME, title: COPY.categories.pageTitle, description: COPY.categories.pageDescription },
+    openGraph: { type: 'website', url: `/categories`, siteName: SITE_NAME, title: COPY.categories.pageTitle, description: COPY.categories.pageDescription, images: SHARE_IMAGES },
   }
 }
 

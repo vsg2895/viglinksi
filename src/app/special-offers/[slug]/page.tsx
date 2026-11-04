@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSpecialOffer } from '@/lib/api'
-import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript } from '@/lib/seo'
+import { buildBreadcrumbSchema, buildWebPageSchema, breadcrumbIdFor, jsonLdScript, SHARE_IMAGES } from '@/lib/seo'
 import { resolveImageUrl } from '@/lib/images'
 import BonusTerms from '@/components/BonusTerms'
 import { CLAIMABLE_BONUS_CATEGORY } from '@/components/SpecialOfferCard'
@@ -78,7 +78,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title,
       description,
       alternates: { canonical: `/special-offers/${slug}` },
-      openGraph: { type: 'article', url: `/special-offers/${slug}`, siteName: SITE_NAME, title, description },
+      openGraph: { type: 'article', url: `/special-offers/${slug}`, siteName: SITE_NAME, title, description, images: SHARE_IMAGES },
       // A hidden offer stays reachable by direct link so it can be reviewed,
       // but it must never enter the index. It is already absent from every
       // listing and from the sitemap; this stops a crawler that finds the URL
