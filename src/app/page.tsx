@@ -14,6 +14,7 @@ import { SITE_URL } from '@/lib/config'
 import type { Category } from '@shared/types/category'
 import type { CasinoWithAttachment } from '@shared/types/casino'
 import type { SpecialOffer } from '@shared/types/specialOffer'
+import { casinosHeading } from '@/lib/categories'
 
 /**
  * Grid placement for the FAQ cards. The grid is 2-up on tablets and 3-up on
@@ -187,7 +188,7 @@ export default async function HomePage({ searchParams }: Props) {
 
             {activeCategory && hasMoreCasinos && (
               <div className="mt-9 text-center">
-                <Link href={`/categories/${selected}`} aria-label={`See all ${activeCategory.name} casinos`} className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
+                <Link href={`/categories/${selected}`} aria-label={`See all ${casinosHeading(activeCategory.name)}`} className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
                   See More →
                 </Link>
               </div>

@@ -8,6 +8,7 @@ import CasinoCard from '@/components/CasinoCard'
 import Pagination from '@/components/Pagination'
 import { SITE_URL } from '@/lib/config'
 import { canonicalPath } from '@/lib/seo/canonical'
+import { casinosHeading } from '@/lib/categories'
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
 
@@ -55,11 +56,12 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
   try {
     const { data } = await getCategory(slug, page)
     // Distinct title per page so paginated views are never reported as duplicates.
-    const title = page > 1 ? `${data.category.name} Casinos — Page ${page}` : `${data.category.name} Casinos`
+    const heading = casinosHeading(data.category.name)
+    const title = page > 1 ? `${heading} — Page ${page}` : heading
     // Was `Best <name> casinos reviewed by <brand>.` — only ~50 characters and
     // formulaic. Composing the category name with this site's own line gives a
     // description long enough for a real snippet, and distinct per domain.
-    const description = `${data.category.name} casinos — ${COPY.categories.categoryMetaSuffix}`
+    const description = `${heading} — ${COPY.categories.categoryMetaSuffix}`
     const canonical = canonicalPathFor(slug, page)
 
     /*
@@ -116,8 +118,9 @@ export default async function CategoryDetailPage({ params, searchParams }: Props
   // Position continues across pages so the ItemList reflects the real ranking
   // rather than restarting at 1 on every page.
   const offset = ((meta?.current_page ?? page) - 1) * (meta?.per_page ?? casinos.length)
+  const heading = casinosHeading(category.name)
   const listSchema = buildItemListSchema(
-    `${category.name} Casinos`,
+    heading,
     `${SITE_URL}${canonicalPathFor(slug, page)}`,
     casinos.map((c, i) => ({ position: offset + i + 1, name: c.name, url: `${SITE_URL}/casinos/${c.slug}` })),
   )
@@ -132,13 +135,13 @@ export default async function CategoryDetailPage({ params, searchParams }: Props
   )
   const graph = [
     buildWebPageSchema({
-      name: `${category.name} Casinos`,
+      name: heading,
       url: pageUrl,
       // The same sentence generateMetadata puts in the meta description. The
       // formulaic "Best <name> casinos reviewed by <brand>." that was here
       // survived from the template: it contradicted the description actually
       // served in the <head>, and read identically on every sibling domain.
-      description: `${category.name} casinos — ${COPY.categories.categoryMetaSuffix}`,
+      description: `${heading} — ${COPY.categories.categoryMetaSuffix}`,
       breadcrumbId: breadcrumbIdFor(pageUrl),
     }),
     breadcrumb,
@@ -154,7 +157,7 @@ export default async function CategoryDetailPage({ params, searchParams }: Props
           <nav className="mb-3 text-sm sm:mb-6 text-faint">
             <Link href="/" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Home</Link> / <Link href="/categories" className="inline-block -mx-1 px-1 py-3 -my-3 hover:text-brand">Categories</Link> / <span className="text-ink-soft">{category.name}</span>
           </nav>
-          <h1 className="text-2xl font-bold sm:text-3xl text-ink">{category.name} Casinos</h1>
+          <h1 className="text-2xl font-bold sm:text-3xl text-ink">{heading}</h1>
           {casinos.length === 0 ? (
             <p className="mt-6 text-muted">{COPY.casinos.noResults}</p>
           ) : (

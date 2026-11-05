@@ -88,9 +88,13 @@ export default function CookieConsent() {
       <div className="mx-auto max-w-3xl rounded-2xl border border-line bg-paper p-5 shadow-2xl sm:flex sm:items-center sm:gap-6">
         <div className="min-w-0">
           <p id="cookie-consent-title" className="text-sm font-bold text-ink">We value your privacy</p>
+          {/* Says what this site really sets. It used to promise analytics "with your
+              consent" on a site that loads no analytics at all. A site that adds an
+              analytics tag must say so here, in its Cookie Policy (admin → Legal
+              identity → Analytics provider) and gate the tag on consent. */}
           <p id="cookie-consent-desc" className="mt-1 text-sm leading-relaxed text-ink-soft">
-            We use cookies for essential site functions and, with your consent, for analytics and affiliate
-            attribution. Read our{' '}
+            No analytics or advertising cookies here: one essential cookie remembers this choice, and operators you
+            visit through our links set their own. Read our{' '}
             <Link href="/cookie-policy" className="font-semibold text-brand underline hover:text-brand">
               Cookie Policy
             </Link>

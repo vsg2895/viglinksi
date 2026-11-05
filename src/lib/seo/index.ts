@@ -112,7 +112,26 @@ export function buildWebPageSchema(params: {
   }
 }
 
+/** HTML from the CMS as one line of plain text for a JSON-LD string, or null. */
+function plainText(html: string | null | undefined): string | null {
+  if (!html) return null
+  const text = html
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#0?39;|&apos;/g, "'")
+    // Last, so "&amp;lt;" ends as the text "&lt;", not as "<".
+    .replace(/&amp;/g, '&')
+    .replace(/\s+/g, ' ')
+    .trim()
+  return text === '' ? null : text
+}
+
 export function buildCasinoReviewSchema(casino: CasinoWithAttachment): WithContext<Review> {
+  const reviewBody = plainText(casino.description)
+
   return {
     '@context': 'https://schema.org',
     '@type': 'Review',
@@ -120,28 +139,39 @@ export function buildCasinoReviewSchema(casino: CasinoWithAttachment): WithConte
     // When the editorial verdict was last revised. Answer engines weight recency
     // heavily when choosing which source to quote.
     ...(casino.updated_at ? { dateModified: casino.updated_at } : {}),
-    reviewBody: casino.description ?? undefined,
+    // PLAIN TEXT. `description` is stored as HTML, and the raw `<p>` tags were
+    // going out inside the JSON-LD string.
+    ...(reviewBody ? { reviewBody } : {}),
+    /*
+     * The casino by NAME only.
+     *
+     * No `url`: the only one we hold is the affiliate tracking link, which is
+     * not the operator's address — it identified the business as a redirect.
+     *
+     * No `aggregateRating`: there are no visitor ratings behind it. One built
+     * from the editor's single score presents one opinion as aggregated user
+     * ratings — what Google's review-snippet guidelines rule out, and a
+     * manual-action pattern. The editor's score is stated once, below.
+     */
     itemReviewed: {
       '@type': 'Organization',
       name: casino.name,
-      url: casino.attachment.affiliate_url,
-      // ratingCount is 1 because this IS one editorial score — the same value the
-      // Review carries. Inflating it to imply crowd-sourced ratings we do not have
-      // would be structured-data spam and risks a manual action.
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: casino.rating,
-        bestRating: 5,
-        worstRating: 0,
-        ratingCount: 1,
-      },
     },
-    reviewRating: {
-      '@type': 'Rating',
-      ratingValue: casino.rating,
-      bestRating: 5,
-      worstRating: 0,
-    },
+    /*
+     * A rating ONLY when the editor set one. `rating` defaults to 0, so 0 means
+     * "not scored yet" — markup claiming a 0/5 verdict would be fabricated.
+     * Without it the Review stays valid; it just earns no stars.
+     */
+    ...(casino.rating > 0
+      ? {
+          reviewRating: {
+            '@type': 'Rating' as const,
+            ratingValue: casino.rating,
+            bestRating: 5,
+            worstRating: 0,
+          },
+        }
+      : {}),
     author: { '@type': 'Organization', name: SITE_NAME },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
   }
