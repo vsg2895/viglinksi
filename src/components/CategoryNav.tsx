@@ -4,6 +4,14 @@ import { COPY } from '@/constants/copy'
 import MobileCollapse from '@/components/MobileCollapse'
 import type { Category } from '@shared/types/category'
 
+/*
+ * The most chips one row holds — see `oneRow` in the component. Seven chips at
+ * the widest labels measured today need ~1130px in the compact one-row size,
+ * which the narrowest home container (1152px) still holds; past that the grid
+ * keeps wrapping.
+ */
+const MAX_ONE_ROW = 7
+
 /**
  * Viglinksi category selector — pill tabs with a gold active state.
  * Mounted on the home page and on the casinos listing; both link at the
@@ -16,6 +24,15 @@ export default function CategoryNav({
   categories: Category[]
   selected: string
 }) {
+  /*
+   * ONE ROW from 1280px, like winpalack: with at most MAX_ONE_ROW categories
+   * the grid becomes a single flex line whose chips share the width equally
+   * (`flex-1 basis-0`), with slightly tighter padding so seven fit this site's
+   * container. `flex-wrap` is only a safety net: a chip never shrinks below
+   * its label, so a longer label wraps the row instead of overflowing it.
+   */
+  const oneRow = categories.length <= MAX_ONE_ROW
+
   return (
     /*
      * ONE FULL-WIDTH COLUMN ON A PHONE; from 640px up, a grid of EQUAL chips,
@@ -50,7 +67,7 @@ export default function CategoryNav({
         countClassName="text-xs text-faint"
         actionClassName="text-brand"
       >
-      <nav aria-label="Casino categories" className="grid grid-cols-1 gap-2 sm:w-max sm:grid-cols-[repeat(2,1fr)] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)] xl:grid-cols-[repeat(5,1fr)] sm:gap-3">
+      <nav aria-label="Casino categories" className={`grid grid-cols-1 gap-2 sm:w-max sm:grid-cols-[repeat(2,1fr)] md:grid-cols-[repeat(3,1fr)] lg:grid-cols-[repeat(4,1fr)] xl:grid-cols-[repeat(5,1fr)] sm:gap-3 ${oneRow ? 'xl:flex xl:w-auto xl:flex-wrap xl:gap-2' : ''}`}>
       {categories.map((c) => {
         const active = c.slug === selected
         return (
@@ -87,7 +104,7 @@ export default function CategoryNav({
             // the edge of the selected chip. Sizing it to the border box leaves nothing
             // to repeat. This chip is the only bordered button on the site, which is
             // why no other gradient here shows the same line.
-            className={`flex w-full justify-center whitespace-nowrap items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${
+            className={`${oneRow ? 'xl:flex-1 xl:basis-0 xl:px-2.5 xl:text-sm' : ''} flex w-full justify-center whitespace-nowrap items-center gap-2 rounded-full px-5 py-3 text-sm font-semibold transition-all ${
               active
                 ? 'border border-transparent bg-origin-border bg-gradient-to-b from-brand-soft to-brand-dark text-black shadow-md shadow-brand/25'
                 : 'border border-line-soft bg-paper text-ink hover:border-brand hover:text-brand'

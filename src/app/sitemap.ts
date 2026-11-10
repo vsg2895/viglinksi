@@ -12,6 +12,22 @@ function safeDate(value: string | null | undefined): Date {
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Started before the first await below rather than after the rest, so these
+  // five lookups overlap the listing fetches instead of queueing behind them.
+  // Never rejects: every entry catches its own failure.
+  const trustPagesPromise = Promise.all(
+    TRUST_PAGE_SLUGS.map(async (slug) => {
+      try {
+        const page = await getPage(slug)
+
+        return page !== null && page.noindex !== true ? { slug, page } : null
+      } catch {
+        // One unreachable page must not empty the whole sitemap.
+        return null
+      }
+    }),
+  )
+
   const [casinosRes, categoriesRes, offersRes, bonusRes] = await Promise.allSettled([
     getCasinos(),
     getCategories(),
@@ -131,18 +147,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
    * Five cached, tagged fetches — the same `getPage()` the route itself uses,
    * so a warm cache makes this free.
    */
-  const trustPages = await Promise.all(
-    TRUST_PAGE_SLUGS.map(async (slug) => {
-      try {
-        const page = await getPage(slug)
-
-        return page !== null && page.noindex !== true ? { slug, page } : null
-      } catch {
-        // One unreachable page must not empty the whole sitemap.
-        return null
-      }
-    }),
-  )
+  const trustPages = await trustPagesPromise
 
   // `flatMap` with an empty array for the misses, rather than `filter` plus a
   // type predicate: the predicate had to restate the element type, and
