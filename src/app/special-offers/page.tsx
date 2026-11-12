@@ -62,15 +62,15 @@ export default async function SpecialOffersPage() {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
       <main className="py-6 px-4 sm:py-12">
-      <div className="container mx-auto max-w-5xl">
+      <div className="mx-auto max-w-[1200px]">
         <header className="mb-4 sm:mb-8">
-          <h1 className="text-2xl font-bold sm:text-3xl text-ink">{COPY.specialOffers.pageTitle}</h1>
-          <p className="mt-1 text-sm text-muted sm:mt-2 sm:text-base">{COPY.specialOffers.pageDescription}</p>
+          <h1 className="font-display text-[38px] leading-none text-ink sm:text-[56px]">{COPY.specialOffers.pageTitle}</h1>
+          <p className="mt-3 max-w-[560px] text-muted">{COPY.specialOffers.pageDescription}</p>
         </header>
         {offers.length === 0 ? (
           <p className="text-muted">{COPY.specialOffers.noResults}</p>
         ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-10 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {offers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
           </div>
         )}

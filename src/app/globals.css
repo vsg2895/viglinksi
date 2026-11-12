@@ -1,9 +1,14 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
-/* Viglinksi — dark plum editorial theme: deep aubergine ground, gold accent,
-   lilac secondary. Fonts: Manrope (sans/body) + Instrument Serif (display).
-   Palette lifted from the Viglinksi design in sites/Viglinksi.html. */
+/* Viglinksi — "the audit desk" (2026-11-11, from sites/viglinksi-redesign.html):
+   an editorial dossier. Left-aligned serif, gold audit stamps, checklists,
+   table-of-contents leaders and horizontal offer shelves.
+   Fonts: Plus Jakarta Sans (body) + Playfair Display (display).
+
+   Same token NAMES as the sibling sites (cream/paper/ink/brand/…), so every
+   shared component works unchanged — only the values differ. All surfaces are
+   dark: a light `cream` would collide with `ink` and hide text. */
 :root {
   --background: #17111f;
   --foreground: #f4efe7;
@@ -13,53 +18,214 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  /* Brand palette (generates real utilities: bg-brand, text-ink, border-line…).
-     Same token NAMES as the sibling sites, so every shared component works
-     unchanged — only the values differ. */
-  /* `cream` is the BASE page surface, `paper` the raised panel above it. On this
-     dark theme both are plum — the names are kept so every component shared with
-     the sibling sites keeps working, but a light value here would collide with
-     `ink` (also light) and render text invisible on its own background. */
+  /* cream = page, ground-2 = band/card ground, paper = panel, surface = raised
+     panel, night = footer. */
   --color-cream: #17111f;
-  --color-paper: #1e1729;
+  --color-ground-2: #1c1526;
+  --color-paper: #211a2d;
+  --color-surface: #2a2138;
+  --color-night: #120d18;
+
   --color-ink: #f4efe7;
   --color-ink-soft: #e9e2f0;
-  --color-muted: #b6a9c4;
-  --color-faint: #8f8299;
-  --color-brand: #e6c37e;
-  --color-brand-dark: #d9b268;
-  --color-brand-soft: #f3dcae;
-  --color-line: #2a2136;
-  --color-line-soft: #352a44;
-  --color-gold: #e6c37e;
-  --color-win: #7fd6a6;
+  --color-muted: #c3b8c9;
+  --color-faint: #93879c;
+
+  /* Gold — the audit stamp. `brand-ink` is the text that goes ON it. */
+  --color-brand: #e5b970;
+  --color-brand-dark: #d4a55a;
+  --color-brand-soft: #f2d29c;
+  --color-brand-ink: #22170a;
+
+  --color-line: #30273f;
+  --color-line-soft: #433756;
+
+  --color-gold: #e5b970;
+  --color-win: #8fd6a6;
   --color-win-bg: #1b2f26;
 
-  /* Lilac secondary, used for links and highlights against the plum ground. */
-  --color-accent: #b072e8;
+  /* Plum — the hero's glow and nothing else. */
+  --color-accent: #b48bd8;
   --color-accent-soft: #c99af0;
 
-  --font-sans: var(--font-manrope);
-  --font-display: var(--font-instrument-serif);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-jakarta);
+  --font-display: var(--font-playfair);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-manrope), Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), Arial, Helvetica, sans-serif;
 }
 
 .font-display {
-  font-family: var(--font-instrument-serif), Georgia, serif;
+  font-family: var(--font-playfair), Georgia, serif;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
 }
 
-/* Warm radial wash used behind the hero. */
+:focus-visible {
+  outline: 2px solid var(--color-gold);
+  outline-offset: 3px;
+}
+
+/* ── Design vocabulary from sites/viglinksi-redesign.html ───────────────────
+   Named classes rather than repeated utility strings: each appears on many
+   elements, and pseudo-elements and hover states cannot be written inline.
+   Un-layered, so they win over Tailwind utilities: keep them to looks only. */
+
+/* The gold eyebrow over a heading. */
+.eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+}
+
+/* The audit stamp: a gold-outlined label set slightly askew. */
+.stamp {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1.5px solid var(--color-gold);
+  color: var(--color-gold);
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  transform: rotate(-4deg);
+  white-space: nowrap;
+}
+
+/* Pill buttons: solid gold, and the hairline outline. */
+.btn-gold {
+  background: var(--color-gold);
+  color: var(--color-brand-ink);
+  border-radius: 999px;
+  transition: background 0.2s;
+}
+.btn-gold:hover { background: var(--color-brand-soft); color: var(--color-brand-ink); }
+.btn-line {
+  border: 1px solid var(--color-line-soft);
+  color: var(--color-ink);
+  border-radius: 999px;
+  transition: border-color 0.2s;
+}
+.btn-line:hover { border-color: var(--color-gold); color: var(--color-ink); }
+
+/* Hero: a plum glow rising from the bottom-left. */
 .hero-wash {
-  background: radial-gradient(900px 420px at 50% -80px, #241a33, #17111f 75%);
+  position: relative;
+  overflow: hidden;
+}
+.hero-wash::after {
+  content: '';
+  position: absolute;
+  left: -10%;
+  bottom: -60%;
+  width: 70%;
+  height: 120%;
+  background: radial-gradient(ellipse, rgba(180, 139, 216, 0.16), transparent 60%);
+  pointer-events: none;
 }
 
-/* ── Responsive safety net (all phones / tablets / laptops / large screens) ── */
+/* The hero's listing checklist, filed under an "AUDIT FILE" tab. */
+.audit-file {
+  position: relative;
+  border-radius: 4px 22px 22px 22px;
+}
+.audit-file::before {
+  content: 'AUDIT FILE';
+  position: absolute;
+  left: -1px;
+  top: -28px;
+  height: 28px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line-soft);
+  border-bottom: 0;
+  border-radius: 10px 10px 0 0;
+}
+
+/* A casino dossier: lifts and turns gold on hover or keyboard focus, and its
+   AUDITED stamp appears. */
+.dossier {
+  transition: border-color 0.25s, background 0.25s, transform 0.25s, box-shadow 0.25s;
+}
+.dossier:hover,
+.dossier:focus-within {
+  border-color: var(--color-gold);
+  background: var(--color-paper);
+  transform: translateY(-3px);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
+}
+.dossier .dossier-stamp {
+  opacity: 0;
+  transform: rotate(-4deg) scale(0.9);
+  transition: opacity 0.25s;
+}
+.dossier:hover .dossier-stamp,
+.dossier:focus-within .dossier-stamp {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .dossier,
+  .dossier:hover,
+  .dossier:focus-within {
+    transition: none;
+    transform: none;
+  }
+}
+
+/* Table-of-contents leader: the dotted rule between a name and its count. */
+.toc-leader {
+  flex: 1;
+  border-bottom: 1px dotted var(--color-line-soft);
+  transform: translateY(-6px);
+}
+
+/* "How to claim": roman numerals in gold italic serif. */
+.roman-steps {
+  counter-reset: step;
+}
+.roman-steps > li {
+  counter-increment: step;
+}
+.roman-steps > li::before {
+  content: counter(step, upper-roman) '.';
+  font-family: var(--font-playfair), Georgia, serif;
+  font-style: italic;
+  color: var(--color-gold);
+  font-size: 24px;
+}
+
+/* FAQ question: "Q." in gold ahead of the italic serif question. */
+.faq-q::before {
+  content: 'Q.';
+  color: var(--color-gold);
+  margin-right: 10px;
+  font-style: normal;
+}
+
+/* The review's opening drop cap. */
+.drop-cap > p:first-child::first-letter {
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 64px;
+  float: left;
+  line-height: 0.85;
+  margin: 6px 10px 0 0;
+  color: var(--color-gold);
+}
+
 html {
   -webkit-text-size-adjust: 100%; /* no iOS text auto-inflation on rotate */
 }

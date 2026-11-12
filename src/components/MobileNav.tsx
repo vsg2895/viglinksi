@@ -39,7 +39,15 @@ export interface MobileNavTheme {
 }
 
 /**
- * The header menu below `md`, replacing the sideways-scrolling nav strip.
+ * Where the menu hands over to the header's nav strip: hidden from `md` (768px,
+ * the default) or from `lg` (1024px, for sites whose strip does not fit a
+ * tablet). Literal class names, so Tailwind generates both.
+ */
+const HIDE_FROM = { md: 'md:hidden', lg: 'lg:hidden' } as const
+
+/**
+ * The header menu below `md` (or `lg`, see `hideFrom`), replacing the
+ * sideways-scrolling nav strip.
  *
  * On a phone that strip showed one or two items and gave no sign the rest
  * existed — on the narrowest logo layouts not even the first item fitted. This
@@ -61,10 +69,13 @@ export default function MobileNav({
   links,
   groups,
   theme,
+  hideFrom = 'md',
 }: {
   links: MobileNavLink[]
   groups: Record<string, MobileNavGroup>
   theme: MobileNavTheme
+  /** The breakpoint from which the header shows its nav strip instead. */
+  hideFrom?: keyof typeof HIDE_FROM
 }) {
   const pathname = usePathname()
   const [openOn, setOpenOn] = useState<string | null>(null)
@@ -155,7 +166,7 @@ export default function MobileNav({
           setOpenGroup(null)
           setOpenOn(open ? null : pathname)
         }}
-        className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors md:hidden ${theme.triggerClassName}`}
+        className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors ${HIDE_FROM[hideFrom]} ${theme.triggerClassName}`}
       >
         <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden>
           {open ? <path d="M6 6l12 12M18 6L6 18" /> : <path d="M4 7h16M4 12h16M4 17h16" />}
@@ -168,7 +179,7 @@ export default function MobileNav({
           // z-40) and swallow taps on the close button. It covers only what is
           // below the header; `pointer-events-none` on the layer itself lets
           // the header above stay live while the panel and backdrop take theirs.
-          <div className="pointer-events-none fixed inset-0 z-50 md:hidden [&>*]:pointer-events-auto" role="presentation">
+          <div className={`pointer-events-none fixed inset-0 z-50 ${HIDE_FROM[hideFrom]} [&>*]:pointer-events-auto`} role="presentation">
             <div ref={backdrop} className="absolute inset-x-0 bottom-0 top-16 bg-black/40 backdrop-blur-sm" aria-hidden onClick={close} />
 
             <div

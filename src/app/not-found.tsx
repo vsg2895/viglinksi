@@ -37,9 +37,9 @@ export default async function NotFound() {
 
   return (
     <main className="px-4 py-24">
-      <div className="container mx-auto max-w-2xl text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand">404</p>
-        <h1 className="mt-4 font-display text-3xl font-semibold text-ink sm:text-4xl">
+      <div className="mx-auto max-w-2xl text-center">
+        <p className="eyebrow">404</p>
+        <h1 className="font-display mt-4 text-[36px] leading-tight text-ink sm:text-[48px]">
           We couldn&rsquo;t find that page
         </h1>
         <p className="mt-4 text-muted">{COPY.errors.notFound} Try one of these instead:</p>
@@ -49,7 +49,7 @@ export default async function NotFound() {
               <li key={href}>
                 <Link
                   href={href}
-                  className="inline-flex min-h-11 items-center rounded-full border border-line-soft bg-paper px-5 py-2.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand"
+                  className="btn-line inline-flex min-h-11 items-center px-5 text-sm font-bold"
                 >
                   {label}
                 </Link>

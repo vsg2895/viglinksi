@@ -6,8 +6,9 @@ import type { BonusSection } from '@/lib/api'
 import { buildItemListSchema, buildWebPageSchema, jsonLdScript, buildFaqSchema, SHARE_IMAGES } from '@/lib/seo'
 import { COPY } from '@/constants/copy'
 import { FAQ_ITEMS } from '@/constants/faq'
-import CasinoCard from '@/components/CasinoCard'
+import CasinoCard, { CASINO_GRID } from '@/components/CasinoCard'
 import BonusCategoryNav from '@/components/BonusCategoryNav'
+import BonusShelves from '@/components/BonusShelves'
 import CategoryNav from '@/components/CategoryNav'
 import SpecialOfferCard from '@/components/SpecialOfferCard'
 import { SITE_URL } from '@/lib/config'
@@ -20,17 +21,22 @@ import { casinosHeading } from '@/lib/categories'
 const HOME_BONUSES_PER_CATEGORY = 3
 
 /**
- * Grid placement for the FAQ cards. The grid is 2-up on tablets and 3-up on
- * desktop, and the number of questions is whatever the site's faq.ts holds, so
- * the LAST card stretches across whatever the final row leaves empty — five
- * questions fill a 3-column grid exactly instead of leaving a hole.
+ * The hero's "audit file": what a casino must clear to be listed — the same
+ * four tests the FAQ below describes. Failing one keeps a casino off the list.
  */
-function faqSpan(i: number): string {
-  const last = i === FAQ_ITEMS.length - 1
-  if (!last) return ''
-  const sm = FAQ_ITEMS.length % 2 === 1 ? 'sm:col-span-2' : 'sm:col-span-1'
-  const lg = { 0: 'lg:col-span-1', 1: 'lg:col-span-3', 2: 'lg:col-span-2' }[FAQ_ITEMS.length % 3] ?? ''
-  return `${sm} ${lg}`
+const LISTING_CHECKS = [
+  { title: 'A current licence', text: 'Valid at the time of the audit.' },
+  { title: 'Honest withdrawal limits', text: 'They match the published terms.' },
+  { title: 'Fair wagering', text: 'A bonus we would accept ourselves.' },
+  { title: 'Clean complaint record', text: 'No unresolved pattern of payout complaints.' },
+] as const
+
+function Tick() {
+  return (
+    <span aria-hidden className="mt-0.5 grid h-6 w-6 place-items-center rounded-full bg-gold/15 text-gold">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
+    </span>
+  )
 }
 
 const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? ''
@@ -143,192 +149,138 @@ export default async function HomePage({ searchParams }: Props) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdScript(graph) }} />
 
       <main>
-        {/* Hero */}
-        <section className="hero-wash relative overflow-hidden px-4 py-10 sm:py-24">
-          <div className="container mx-auto max-w-4xl text-center">
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand px-3.5 py-1.5 text-[10px] font-semibold uppercase tracking-[0.2em] sm:mb-8 sm:px-5 sm:py-2 sm:text-xs sm:tracking-[0.25em] text-brand">
-              {COPY.home.heroEyebrow}
-            </p>
-            <h1 className="font-display text-[2rem] font-semibold leading-[1.05] tracking-tight text-balance text-ink sm:text-6xl">
-              {COPY.home.heroHeadline}{' '}
-              <br className="hidden sm:block" />
-              <em className="font-medium italic text-brand">{COPY.home.heroHighlight}</em>
-            </h1>
-            <p className="mx-auto mt-4 max-w-xl text-[15px] text-muted sm:mt-7 sm:text-lg">
-              {COPY.home.heroSubtitle}
-            </p>
-            <div className="mt-6 flex flex-col justify-center gap-2.5 sm:mt-11 sm:gap-4 sm:flex-row">
-              <Link href="/casinos" className="rounded-full bg-gradient-to-b from-brand-soft to-brand-dark w-full sm:w-auto whitespace-nowrap px-6 py-3.5 text-center text-base font-bold sm:flex-none sm:px-9 sm:py-4 sm:text-base text-black shadow-lg shadow-brand/30 transition-transform hover:-translate-y-0.5">{COPY.home.featuredCasinos}</Link>
-              {anyOffersVisible && (
-                <Link href="/special-offers" className="rounded-full border border-line-soft bg-paper w-full sm:w-auto whitespace-nowrap px-6 py-[13px] text-center text-base font-bold sm:flex-none sm:px-9 sm:py-[15px] sm:text-base text-ink transition-colors hover:border-brand hover:text-brand">{COPY.home.specialOffers}</Link>
-              )}
-            </div>
-          </div>
-        </section>
-
-        {/* Casinos by category */}
-        <section className="px-4 py-8 sm:py-14" aria-labelledby="top-casinos-heading">
-          <div className="container mx-auto max-w-6xl">
-            <div className="mb-4 flex items-end justify-between gap-4 sm:mb-8">
-              <div>
-                <h2 id="top-casinos-heading" className="font-display text-2xl font-semibold text-ink sm:text-4xl">{COPY.home.topCasinosTitle}</h2>
-                <p className="mt-1 text-sm text-muted sm:mt-2 sm:text-base">{COPY.home.topCasinosSubtitle}</p>
+        {/* Hero: the claim on the left, the audit file on the right. */}
+        <section className="hero-wash border-b border-line">
+          <div className="relative z-[1] mx-auto flex max-w-[1200px] flex-wrap items-center gap-14 px-4 pb-[72px] pt-16 sm:pt-20">
+            <div className="min-w-0 flex-[1.3_1_540px]">
+              <p className="eyebrow">{COPY.home.heroEyebrow}</p>
+              <h1 className="font-display mt-5 text-[42px] font-semibold leading-[1.02] text-ink sm:text-[clamp(42px,6vw,80px)]">
+                {COPY.home.heroHeadline}{' '}
+                <em className="block text-gold">{COPY.home.heroHighlight}</em>
+              </h1>
+              <p className="mt-6 max-w-[480px] text-lg text-muted">{COPY.home.heroSubtitle}</p>
+              <div className="mt-8 flex flex-wrap gap-3">
+                <Link href="/casinos" className="btn-gold inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 text-[15px] font-bold">
+                  {COPY.home.featuredCasinos}
+                </Link>
+                {/* Only when a visible offer exists: a button to an empty page
+                    is worse than no button. */}
+                {anyOffersVisible && (
+                  <Link href="/special-offers" className="btn-line inline-flex min-h-12 items-center justify-center whitespace-nowrap px-6 text-[15px] font-bold">
+                    {COPY.home.specialOffers}
+                  </Link>
+                )}
               </div>
             </div>
 
+            <aside aria-labelledby="listing-checks" className="audit-file mt-7 min-w-0 flex-[1_1_340px] border border-line-soft bg-paper px-[26px] pb-[22px] pt-7 lg:ml-auto lg:max-w-[430px]">
+              <h2 id="listing-checks" className="font-display text-[28px] leading-[1.1] text-ink">What a casino must clear to be listed</h2>
+              <ul className="mt-[18px]">
+                {LISTING_CHECKS.map((check) => (
+                  <li key={check.title} className="grid grid-cols-[28px_minmax(0,1fr)] gap-3 border-t border-line py-3 text-[15px] text-muted">
+                    <Tick />
+                    <div>
+                      <b className="block font-bold text-ink">{check.title}</b>
+                      {check.text}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <span className="stamp absolute -bottom-3.5 right-5 bg-cream">FAIL ONE, NOT LISTED</span>
+            </aside>
+          </div>
+        </section>
+
+        {/* The audited list */}
+        <section className="py-20" aria-labelledby="top-casinos-heading">
+          <div className="mx-auto max-w-[1200px] px-4">
+            <p className="eyebrow">Cleared operators</p>
+            <h2 id="top-casinos-heading" className="font-display mt-2.5 text-[38px] leading-none text-ink sm:text-[clamp(38px,5vw,62px)]">{COPY.home.topCasinosTitle}</h2>
+            <p className="mt-3 max-w-[520px] text-muted">{COPY.home.topCasinosSubtitle}</p>
+
             {categories.length > 0 && selected && (
-              <div className="mb-5 sm:mb-8"><CategoryNav categories={categories} selected={selected} /></div>
+              <div className="mt-7"><CategoryNav categories={categories} selected={selected} /></div>
             )}
 
             {casinos.length === 0 ? (
-              <p className="text-muted">{COPY.casinos.noResults}</p>
+              <p className="mt-6 text-muted">{COPY.casinos.noResults}</p>
             ) : (
-              <ol className="flex flex-col gap-5">
+              <ol className={`mt-[26px] ${CASINO_GRID}`}>
                 {casinos.map((casino, i) => <CasinoCard key={casino.id} casino={casino} rank={i + 1} />)}
               </ol>
             )}
 
             {activeCategory && hasMoreCasinos && (
-              <div className="mt-9 text-center">
-                <Link href={`/categories/${selected}`} aria-label={`See all ${casinosHeading(activeCategory.name)}`} className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
-                  See More →
+              <div className="mt-7">
+                <Link href={`/categories/${selected}`} aria-label={`See The Full List — ${casinosHeading(activeCategory.name)}`} className="btn-line inline-flex min-h-12 items-center px-6 text-[15px] font-bold">
+                  See The Full List →
                 </Link>
               </div>
             )}
           </div>
         </section>
 
-        {/* Bonus types — directly under the casino list.
-
-            The casinos are what visitors came for, so they come first under
-            the hero; the bonus-type chips follow as the next way in.
-
-            Renders nothing when the site does not publish the Bonus area, so
-            the band collapses rather than leaving a gap. */}
+        {/* Bonus categories — renders nothing when the site does not publish
+            the Bonus area, so the band collapses rather than leaving a gap. */}
         {bonusSections.length > 0 && (
-          <section className="px-4 pb-10">
-            <div className="container mx-auto max-w-6xl">
-              {/*
-                * The chips sit on their own panel rather than on the bare page.
-                *
-                * On the plain ground the row read as loose buttons left over
-                * from the hero; a panel makes it one control surface, which is
-                * what it is. The colour is this site's own — the two blurred
-                * discs are its brand and accent, kept low enough that the CHIPS
-                * stay the brightest thing in the band. A saturated panel would
-                * flatten them by contrast.
-                */}
-              {/*
-                * The panel is the PAGE'S OWN GROUND with a wash of this site's
-                * colour over it — not `bg-paper`.
-                *
-                * Paper is what the CHIPS are made of (and on crogambline a chip
-                * is a border with nothing behind it at all), so a paper panel
-                * left every chip invisible and the row read as a wireframe
-                * table: hairlines on a flat field. Putting the panel on the
-                * ground the chips normally sit on restores the contrast they
-                * are designed for, and the tint is what makes it a band rather
-                * than empty page.
-                *
-                * No ring either. On a dark ground a `ring-line` drew a hard
-                * rectangle around the whole block — one more line in a block
-                * whose problem was lines. The tint gives it its edge.
-                */}
-              <div className="relative overflow-hidden rounded-3xl bg-cream px-4 py-6 sm:px-8 sm:py-8">
-                {/* Decoration only. No -z-10: the panel paints its own
-                    background, and a layer sent behind it would never be seen. */}
-                <div aria-hidden className="pointer-events-none absolute inset-0">
-                  <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(230,195,126,0.12),transparent_62%)]" />
-                  <div className="absolute -left-24 -top-28 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(230,195,126,0.20),transparent_70%)] blur-2xl" />
-                  <div className="absolute -right-20 -bottom-28 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(176,114,232,0.18),transparent_70%)] blur-2xl" />
-                </div>
-
-                <div className="relative">
-                  <BonusCategoryNav sections={bonusSections} />
-                </div>
-              </div>
+          <section className="pb-20">
+            <div className="mx-auto max-w-[1200px] px-4">
+              <BonusCategoryNav sections={bonusSections} />
             </div>
           </section>
         )}
 
-        {/* Bonuses — one heading, then a block per bonus type, like winpalack.
-            Built from the same getBonusArea payload as the chips and the
-            header/footer Bonuses menus, so no block links to a type the menu
-            lacks. A site without the Bonus area keeps the flat grid below. */}
+        {/* Bonuses — a shelf per bonus type, built from the same getBonusArea
+            payload as the index above and the header/footer menus, so no shelf
+            links to a type the menu lacks. A site without the Bonus area keeps
+            the flat offers grid instead. */}
         {bonusSections.length > 0 ? (
-          <section className="border-t border-line px-4 py-16" aria-labelledby="bonus-heading">
-            <div className="container mx-auto max-w-6xl">
-              <div className="mb-10 flex items-end justify-between gap-4">
-                <h2 id="bonus-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.bonus}</h2>
-                <Link href="/special-offers" className="hidden py-3 -my-3 text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
+          <section className="pb-20" aria-labelledby="bonus-heading">
+            <div className="mx-auto max-w-[1200px] px-4">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <div>
+                  <p className="eyebrow">Fair-wagering offers</p>
+                  <h2 id="bonus-heading" className="font-display mt-2.5 text-[38px] leading-none text-ink sm:text-[clamp(38px,5vw,62px)]">{COPY.home.bonus}</h2>
+                </div>
+                <Link href="/special-offers" aria-label={`${COPY.home.viewAll} bonuses`} className="inline-flex min-h-11 items-center font-bold text-gold hover:text-brand-soft">{COPY.home.viewAll} →</Link>
               </div>
-              <div className="space-y-12">
-                {bonusSections.map((section) => (
-                  /* id: /#bonus-<slug> anchors, as on winpalack; scroll-mt clears the sticky header. */
-                  <div key={section.id} id={`bonus-${section.slug}`} className="scroll-mt-24">
-                    <div className="mb-5">
-                      <h3 className="font-display text-xl font-bold text-ink sm:text-2xl">
-                        <Link href={`/bonuses/${section.slug}`} className="transition-colors hover:text-brand-dark">
-                          {section.name}
-                        </Link>
-                      </h3>
-                      {section.description && <p className="mt-1 text-muted">{section.description}</p>}
-                    </div>
-                    <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
-                      {section.offers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
-                    </div>
-                    <div className="mt-5">
-                      <Link href={`/bonuses/${section.slug}`} aria-label={`${COPY.home.seeMore} — ${section.name}`} className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
-                        {COPY.home.seeMore} →
-                      </Link>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-9 text-center">
-                <Link href="/special-offers" aria-label={COPY.home.seeAllBonuses} className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
+              <BonusShelves sections={bonusSections} />
+              <div className="mt-7">
+                <Link href="/special-offers" className="btn-line inline-flex min-h-12 items-center px-6 text-[15px] font-bold">
                   {COPY.home.seeAllBonuses} →
                 </Link>
               </div>
             </div>
           </section>
         ) : topOffers.length > 0 && (
-          <section className="border-t border-line px-4 py-16" aria-labelledby="offers-heading">
-            <div className="container mx-auto max-w-6xl">
-              <div className="mb-10 flex items-end justify-between gap-4">
-                <h2 id="offers-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.specialOffers}</h2>
-                <Link href="/special-offers" className="hidden py-3 -my-3 text-sm font-bold text-brand hover:text-brand-dark sm:block whitespace-nowrap">{COPY.home.viewAll} →</Link>
+          <section className="pb-20" aria-labelledby="offers-heading">
+            <div className="mx-auto max-w-[1200px] px-4">
+              <div className="flex flex-wrap items-end justify-between gap-4">
+                <h2 id="offers-heading" className="font-display mt-2.5 text-[38px] leading-none text-ink sm:text-[clamp(38px,5vw,62px)]">{COPY.home.specialOffers}</h2>
+                <Link href="/special-offers" aria-label={`${COPY.home.viewAll} offers`} className="inline-flex min-h-11 items-center font-bold text-gold hover:text-brand-soft">{COPY.home.viewAll} →</Link>
               </div>
-              <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {topOffers.map((offer) => <SpecialOfferCard key={offer.id} offer={offer} />)}
-              </div>
-
-              <div className="mt-9 text-center">
-                <Link href="/special-offers" aria-label="See all special offers" className="inline-flex rounded-full border border-line-soft bg-paper px-7 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-brand hover:text-brand">
-                  See More →
-                </Link>
               </div>
             </div>
           </section>
         )}
-        {/* FAQ — rendered visibly because FAQPage structured data requires it.
-            Wider than the rest of the page (90rem, not the 6xl the listings
-            use) and with roomier cards on desktop: a block of prose reads better with a
-            longer measure than a list of casino cards does, and the old
-            max-w-3xl column left a third of the screen empty on each side.
-            Three-up card grid, two-up on tablets, one column on phones. */}
-        <section className="border-t border-line px-4 py-16 sm:px-6 lg:px-8 lg:py-20" aria-labelledby="faq-heading">
-          <div className="mx-auto max-w-[90rem]">
-            <h2 id="faq-heading" className="font-display text-3xl font-semibold text-ink sm:text-4xl">{COPY.home.faqTitle}</h2>
-            <dl className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-7">
-              {FAQ_ITEMS.map((item, i) => (
-                <div key={item.question} className={`${faqSpan(i)} rounded-2xl bg-paper p-6 lg:p-8 shadow-[0_10px_30px_rgba(28,36,48,0.07)]`}>
-                  <dt className="font-bold text-ink text-base lg:text-lg">{item.question}</dt>
-                  <dd className="mt-3 text-sm leading-relaxed text-muted lg:text-base">{item.answer}</dd>
+
+        {/* FAQ — rendered visibly because FAQPage structured data requires it,
+            from the same FAQ_ITEMS array the schema is built from. Question on
+            the left, answer on the right, from lg. */}
+        <section aria-labelledby="faq-heading">
+          <div className="mx-auto max-w-[1200px] px-4">
+            <p className="eyebrow">FAQ</p>
+            <h2 id="faq-heading" className="font-display mt-2.5 text-[38px] leading-none text-ink sm:text-[clamp(38px,5vw,62px)]">{COPY.home.faqTitle}</h2>
+            <div className="mt-[30px] border-t border-line">
+              {FAQ_ITEMS.map((item) => (
+                <div key={item.question} className="grid grid-cols-1 gap-3 border-b border-line py-[30px] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.25fr)] lg:gap-10">
+                  <h3 className="faq-q font-display text-[26px] italic leading-[1.15] text-ink sm:text-[30px]">{item.question}</h3>
+                  <p className="leading-[1.75] text-muted">{item.answer}</p>
                 </div>
               ))}
-            </dl>
+            </div>
           </div>
         </section>
       </main>

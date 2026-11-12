@@ -60,14 +60,15 @@ export default function NewsletterForm() {
   }
 
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-6">
-      <div>
-        <p className="font-display text-base font-semibold text-ink sm:text-lg">{COPY.newsletter.title}</p>
-        <p className="mt-0.5 text-sm text-muted">{COPY.newsletter.subtitle}</p>
+    <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="min-w-0 flex-[1_1_360px]">
+        <p className="font-display text-[21px] leading-[1.1] text-ink">{COPY.newsletter.title}</p>
+        <p className="mt-0.5 text-[13px] text-muted">{COPY.newsletter.subtitle}</p>
       </div>
 
-      <div className="w-full sm:w-auto">
-        <form onSubmit={onSubmit} className="relative flex gap-2.5">
+      <div className="w-full min-w-0 flex-[0_1_430px]">
+        {/* One pill holding the field and the button; the pill takes the focus ring. */}
+        <form onSubmit={onSubmit} className="relative flex rounded-full border border-line-soft bg-ground-2 p-1 focus-within:border-gold">
 
           {/* HONEYPOT. Never shown, never focusable, never autofilled — a human
               cannot reach it, a naive bot fills every field it finds. The server
@@ -112,12 +113,12 @@ export default function NewsletterForm() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             placeholder={COPY.newsletter.placeholder}
-            className="w-full rounded-xl border min-h-11 border-line-soft bg-paper px-4 py-2.5 text-base text-ink placeholder:text-faint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 sm:w-72"
+            className="h-[42px] w-full min-w-0 flex-1 bg-transparent px-4 text-sm text-ink placeholder:text-faint focus:outline-none"
           />
           <button
             type="submit"
             disabled={loading}
-            className="min-h-11 shrink-0 rounded-xl bg-gradient-to-b from-brand-soft to-brand-dark px-6 py-2.5 text-sm font-bold text-black shadow-md shadow-brand/25 transition-transform hover:-translate-y-0.5 disabled:opacity-60"
+            className="btn-gold min-h-[42px] shrink-0 px-5 text-sm font-bold disabled:opacity-60"
           >
             {loading ? COPY.newsletter.checking : COPY.newsletter.button}
           </button>

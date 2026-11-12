@@ -1,50 +1,40 @@
 import Link from 'next/link'
 
 /**
- * Viglinksi brand logo: a gold audit seal (ring + check) next to the "Viglinksi"
- * wordmark and the "CASINO INTELLIGENCE" tagline, both taken from the design in
- * sites/Viglinksi.html.
+ * Viglinksi brand logo, from sites/viglinksi-redesign.html: a gold-ringed
+ * audit seal holding a check, beside the serif "Viglinksi" wordmark (the
+ * second half in gold italic) and the "CASINO INTELLIGENCE" tagline.
  *
- * Same component contract as the sibling sites — one optional `className`, the
- * Link carries the accessible name, the artwork is aria-hidden so a screen
- * reader announces the destination once rather than twice. Inlined SVG so it
- * renders instantly, scales crisply and costs no extra request.
+ * Same component contract as the sibling sites: one optional `className`. The
+ * Link has NO aria-label: its visible text is its accessible name, and a label
+ * that did not start with that text failed Lighthouse's
+ * label-content-name-mismatch audit.
  */
+
+/** The bare seal. Exported because the footer shows the same artwork. */
+export function LogoMark({ size = 40 }: { size?: number }) {
+  return (
+    <span
+      aria-hidden="true"
+      className="grid shrink-0 place-items-center rounded-full border-[1.5px] border-gold"
+      style={{ width: size, height: size }}
+    >
+      <svg width={size * 0.45} height={size * 0.45} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" className="text-gold">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    </span>
+  )
+}
+
 export default function Logo({ className = '' }: { className?: string }) {
   return (
-    <Link
-      href="/"
-      aria-label="Viglinksi home"
-      className={`inline-flex min-h-11 shrink-0 items-center gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 ${className}`.trim()}
-    >
-      {/* Audit seal */}
-      <span
-        aria-hidden="true"
-        className="grid h-10 w-10 shrink-0 place-items-center rounded-full shadow-md shadow-black/40"
-        style={{ background: 'radial-gradient(circle at 30% 25%, #3a2352 0%, #1e1729 70%)' }}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" role="presentation">
-          <circle cx="12" cy="12" r="9" stroke="#e6c37e" strokeWidth="1.6" />
-          <path
-            d="M8 12.2l2.6 2.6L16 9.4"
-            stroke="#e6c37e"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-
-      {/* Wordmark */}
-      <span className="flex flex-col leading-none">
-        <span className="font-sans text-[22px] font-bold tracking-tight text-ink">
-          Vig<span className="text-brand">linksi</span>
+    <Link href="/" className={`inline-flex min-h-11 shrink-0 items-center gap-3 rounded-lg ${className}`.trim()}>
+      <LogoMark />
+      <span className="flex flex-col">
+        <span className="font-display text-[26px] leading-none text-ink">
+          Vig<span className="italic text-gold">linksi</span>
         </span>
-        {/* The tagline's tracking sets the logo's width; tighter below 360px so
-            the burger keeps the header's 16px side padding at 320. */}
-        <span className="mt-[3px] text-xs font-medium tracking-[0.18em] max-[359px]:tracking-[0.08em] text-faint">
-          CASINO INTELLIGENCE
-        </span>
+        <span className="mt-1 text-[10px] font-bold uppercase tracking-[0.24em] text-faint">Casino intelligence</span>
       </span>
     </Link>
   )

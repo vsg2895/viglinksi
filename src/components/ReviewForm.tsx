@@ -144,7 +144,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
               onClick={() => setRating(n)}
               className={`h-11 w-11 rounded-xl border text-sm font-semibold transition-colors ${
                 rating >= n
-                  ? 'border-brand bg-gradient-to-b from-brand-soft to-brand-dark text-white'
+                  ? 'border-gold bg-gold/15 text-gold'
                   : 'border-line-soft bg-paper text-faint hover:border-brand'
               }`}
             >
@@ -188,7 +188,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
         {errors.body && <p className={errorText}>{errors.body}</p>}
       </div>
 
-      <button type="submit" disabled={loading} className="mt-5 min-h-11 rounded-xl bg-gradient-to-b from-brand-soft to-brand-dark px-6 py-2.5 text-sm font-bold text-white shadow-md shadow-brand/25 transition-transform hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60">
+      <button type="submit" disabled={loading} className="btn-gold mt-5 min-h-12 px-6 text-[15px] font-bold disabled:cursor-not-allowed disabled:opacity-60">
         {COPY.reviews.submit}
       </button>
     </form>

@@ -39,7 +39,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const casinoUrls: MetadataRoute.Sitemap =
     casinosRes.status === 'fulfilled'
-      ? casinosRes.value.data.map((c) => ({
+      ? casinosRes.value.data
+          // Resolved per site by the API (SiteContentResolver), like the casino
+          // page's robots tag — a noindexed page must not be submitted.
+          .filter((c) => c.seo?.noindex !== true)
+          .map((c) => ({
           url: `${SITE_URL}/casinos/${c.slug}`,
           lastModified: safeDate(c.updated_at),
           changeFrequency: 'weekly',
