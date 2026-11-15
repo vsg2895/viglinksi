@@ -72,7 +72,7 @@ export default function CasinoSpecialOffers({ offers }: { offers: SpecialOffer[]
           >
             {/* The bonus TYPE, as the editor named it; an unfiled offer leaves
                 the cell empty rather than printing a blank label. */}
-            <span className="eyebrow text-[10px]">{offer.bonus_category_name ?? ''}</span>
+            <span className="eyebrow text-[11px]">{offer.bonus_category_name ?? ''}</span>
             <span className="min-w-0">
               <b className="block font-display text-[24px] font-normal leading-[1.1]">{offer.title}</b>
               {offer.bonuses && <span className="line-clamp-2 text-sm text-muted">{offer.bonuses}</span>}

@@ -223,18 +223,20 @@ export default async function CasinoDetailPage({ params }: Props) {
         )}
 
         {/* The ID card: logo, name, score and offer, with the CTA at the end of
-            the row from lg (under the rest below it). */}
-        <div className="mt-7 grid grid-cols-[88px_minmax(0,1fr)] items-center gap-x-5 gap-y-4 rounded-[22px] border border-line-soft bg-paper p-5 sm:grid-cols-[120px_minmax(0,1fr)] sm:p-6 lg:grid-cols-[140px_minmax(0,1fr)_auto]">
+            the row from lg (under the rest below it). Below 416px the logo sits
+            ABOVE the name: beside it, a one-word name like "Luckydreams" would
+            break mid-word at this size. */}
+        <div className="mt-7 grid grid-cols-1 items-center gap-x-5 gap-y-4 rounded-[22px] border border-line-soft bg-paper p-5 min-[26rem]:grid-cols-[88px_minmax(0,1fr)] sm:grid-cols-[120px_minmax(0,1fr)] sm:p-6 lg:grid-cols-[140px_minmax(0,1fr)_auto]">
           <LogoPaper casino={casino} className="h-[88px] w-[88px] rounded-2xl p-2 sm:h-[120px] sm:w-[120px] lg:h-[140px] lg:w-[140px]" sizes="140px" />
           <div className="flex min-w-0 flex-col gap-2">
-            <h1 className="font-display text-[34px] leading-none text-ink sm:text-[44px]">{casino.name}</h1>
+            <h1 className="font-display text-[34px] leading-none text-ink [overflow-wrap:anywhere] sm:text-[44px]">{casino.name}</h1>
             <p className="flex items-center gap-2 text-sm text-muted">
               <Stars rating={casino.rating} />
               {casino.rating.toFixed(1)}
             </p>
             {casino.bonuses && <p className="font-display text-[22px] italic leading-[1.2] text-gold sm:text-[24px]">{casino.bonuses}</p>}
           </div>
-          <a href={casino.attachment.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="btn-gold col-span-2 inline-flex min-h-12 items-center justify-center whitespace-nowrap px-8 text-[15px] font-bold lg:col-span-1">
+          <a href={casino.attachment.affiliate_url} target="_blank" rel="nofollow sponsored noopener" className="btn-gold col-span-full inline-flex min-h-12 items-center justify-center whitespace-nowrap px-8 text-[15px] font-bold lg:col-span-1">
             {COPY.casinos.visitCasino}
           </a>
         </div>

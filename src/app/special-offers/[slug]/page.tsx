@@ -218,7 +218,7 @@ export default async function SpecialOfferDetailPage({ params }: Props) {
             Next 16 `priority` emits the preload at the browser's default Low
             priority, and this image is the mobile LCP. */}
         {banner && (
-          <div className="relative mt-[22px] aspect-[16/6] overflow-hidden rounded-2xl bg-paper">
+          <div className="relative mt-[22px] aspect-[16/6] overflow-hidden rounded-2xl">
             <Image src={banner} alt={offer.title} fill className="object-contain object-center" sizes={BANNER_SIZES} preload fetchPriority="high" />
           </div>
         )}
