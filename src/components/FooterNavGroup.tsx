@@ -78,7 +78,7 @@ export default function FooterNavGroup({
           text alignment. */}
       {open && (
         <div className="mt-3">
-        <ul id={panelId} role="list" className={`inline-flex flex-col gap-2 border-l-2 pl-3 text-left ${guideClassName}`}>
+        <ul id={panelId} role="list" className={`inline-flex flex-col border-l-2 pl-3 text-left ${guideClassName}`}>
           <li>
             <Link href={href} className={`${linkClassName} font-semibold`}>
               {allLabel}

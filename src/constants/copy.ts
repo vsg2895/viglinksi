@@ -202,6 +202,9 @@ export const COPY = {
     ratingLabel: 'Rating',
     titleLabel: 'Headline (optional)',
     bodyLabel: 'Your review',
+    namePlaceholder: 'First name or nickname',
+    emailPlaceholder: 'you@example.com',
+    titlePlaceholder: 'One line on what the audit missed',
     bodyPlaceholder: 'What was your experience \u2014 payouts, support, verification?',
     submit: 'Submit Review',
     // Two outcomes, because the site can run pre- or post-moderation

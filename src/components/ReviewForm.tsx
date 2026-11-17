@@ -106,6 +106,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
           </label>
           <input
             id="review-name"
+            placeholder={COPY.reviews.namePlaceholder}
             type="text"
             required
             maxLength={120}
@@ -122,6 +123,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
           </label>
           <input
             id="review-email"
+            placeholder={COPY.reviews.emailPlaceholder}
             type="email"
             maxLength={255}
             value={email}
@@ -161,6 +163,7 @@ export default function ReviewForm({ casinoSlug }: { casinoSlug: string }) {
         </label>
         <input
           id="review-title"
+          placeholder={COPY.reviews.titlePlaceholder}
           type="text"
           maxLength={160}
           value={title}
