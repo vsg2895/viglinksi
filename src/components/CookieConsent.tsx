@@ -5,8 +5,14 @@ import Link from 'next/link'
 
 // Persisted consent record. Bump CONSENT_VERSION to re-prompt everyone after a
 // material change to the Cookie Policy.
+//
+// v2 (2026-11-25) — Special Offer pages now record the visiting address and
+// look up its country when consent is given. Everyone who answered under v1
+// agreed to a banner that said the opposite ("no analytics"), so their answer
+// cannot carry over: the bump re-asks them, and until they answer again
+// consentChoice() returns null and the tracker stays off.
 const STORAGE_KEY = 'cookie-consent'
-const CONSENT_VERSION = 1
+const CONSENT_VERSION = 2
 
 type Choice = 'all' | 'necessary'
 
@@ -67,6 +73,41 @@ function recordConsent(choice: Choice): void {
 }
 
 /** Reopen the consent banner — used by the footer "Cookie settings" link. */
+/**
+ * The visitor's current answer, or null if they have not given one.
+ *
+ * Exported so that anything consent-gated reads the SAME record the banner
+ * writes, rather than parsing localStorage itself and drifting from it the
+ * first time CONSENT_VERSION is bumped.
+ *
+ * GPC is treated as a standing "necessary only": the Privacy Policy says the
+ * signal is honoured as an opt-out, so a browser sending it never counts as
+ * having accepted, even before the banner is answered.
+ */
+export function consentChoice(): Choice | null {
+  try {
+    if (gpcOptOut()) {
+      const raw = localStorage.getItem(STORAGE_KEY)
+      if (!raw) return 'necessary'
+      const parsed = JSON.parse(raw) as { choice?: Choice; v?: number }
+      return parsed?.v === CONSENT_VERSION ? (parsed.choice ?? 'necessary') : 'necessary'
+    }
+
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw) as { choice?: Choice; v?: number }
+    return parsed?.v === CONSENT_VERSION ? (parsed.choice ?? null) : null
+  } catch {
+    // Storage blocked: treat as "no consent given", never as acceptance.
+    return null
+  }
+}
+
+/** Run `cb` whenever the recorded choice changes. Returns an unsubscribe. */
+export function onConsentChange(cb: () => void): () => void {
+  return subscribe(cb)
+}
+
 export function openCookieSettings(): void {
   forced = true
   listeners.forEach((notify) => notify())
@@ -93,8 +134,11 @@ export default function CookieConsent() {
               analytics tag must say so here, in its Cookie Policy (admin → Legal
               identity → Analytics provider) and gate the tag on consent. */}
           <p id="cookie-consent-desc" className="mt-1 text-sm leading-relaxed text-ink-soft">
-            No analytics or advertising cookies here: one essential cookie remembers this choice, and operators you
-            visit through our links set their own. Read our{' '}
+            No advertising cookies: one essential cookie remembers this choice. If you accept, we also record
+            the network address your device connects from when you open a bonus page, and look up which country
+            you are visiting from — we use it to understand where our visitors are and to spot fraud. Operators
+            you visit through our links set their own cookies.
+ Read our{' '}
             <Link href="/cookie-policy" className="font-semibold text-brand underline hover:text-brand">
               Cookie Policy
             </Link>
