@@ -134,10 +134,11 @@ export default function CookieConsent() {
               analytics tag must say so here, in its Cookie Policy (admin → Legal
               identity → Analytics provider) and gate the tag on consent. */}
           <p id="cookie-consent-desc" className="mt-1 text-sm leading-relaxed text-ink-soft">
-            No advertising cookies: one essential cookie remembers this choice. If you accept, we also record
-            the network address your device connects from when you open a bonus page, and look up which country
-            you are visiting from — we use it to understand where our visitors are and to spot fraud. Operators
-            you visit through our links set their own cookies.
+            One essential cookie remembers your choice here. Separately, when you open a bonus page we record the
+            network address your device connects from and look up which country it is in — we do this for every
+            visit, to understand where our visitors are and to detect fraud, and you can object or ask us to delete
+            it. No advertising cookies. Operators you visit through our links set their own.
+
  Read our{' '}
             <Link href="/cookie-policy" className="font-semibold text-brand underline hover:text-brand">
               Cookie Policy

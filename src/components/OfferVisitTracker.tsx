@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect } from 'react'
-import { consentChoice, onConsentChange } from './CookieConsent'
+import { consentChoice } from './CookieConsent'
 
 /**
  * Records a visit to a Special Offer page.
@@ -12,17 +12,26 @@ import { consentChoice, onConsentChange } from './CookieConsent'
  * is worth less than no tracker.
  *
  * ────────────────────────────────────────────────────────────────────────────
- * CONSENT IS THE GATE, and it is not decoration.
+ * RUNS ON PAGE OPEN, WITHOUT WAITING FOR AN ANSWER — changed 2026-11-27 at the
+ * site owner's direction, having previously been gated on `consent === 'all'`.
  *
- * These sites tell visitors in the banner that no analytics cookies are set
- * and nothing is collected until they say yes. This component therefore does
- * NOTHING until `consentChoice() === 'all'` — not a fetch, not a beacon. A
- * visitor who chose "necessary only", who has Global Privacy Control on, or
- * who has simply not answered yet is never tracked. If they accept later, the
- * subscription below picks it up without a reload.
+ * What that changes, stated plainly because the next person to read this will
+ * need to know: a visitor who has not touched the banner, or who chose
+ * "necessary only", is now recorded. The banner copy and the Privacy Policy
+ * were rewritten in the same change so they describe this rather than the old
+ * behaviour — if you alter what is collected here, those two have to move with
+ * it or the sites are telling visitors something untrue.
  *
- * The server still sees the ordinary request headers of the page itself, as
- * every web server does; what is gated here is recording them as a visit.
+ * The lawful basis in the policy is no longer consent but legitimate interest
+ * (fraud prevention and knowing where visitors come from). That is a defensible
+ * basis for it, and it is not a blank cheque: it is why the answer is still
+ * recorded on the row, and why the one exception below exists.
+ *
+ * THE ONE EXCEPTION: Global Privacy Control. A browser sending GPC is making an
+ * explicit, machine-readable "do not track me" statement — unlike a visitor who
+ * simply has not clicked anything yet — and the Privacy Policy promises it is
+ * honoured. It is a tiny share of traffic, so ignoring it would buy almost no
+ * data for real exposure. Remove this only together with that promise.
  * ────────────────────────────────────────────────────────────────────────────
  *
  * WHAT IS DELIBERATELY NOT HERE: WebRTC / STUN candidate harvesting. Its only
@@ -97,8 +106,15 @@ export default function OfferVisitTracker({ specialOfferId }: Props) {
       // Once per mount, whatever happens afterwards.
       if (done || cancelled) return
 
+      // The explicit opt-out, and the only thing that stops this now.
+      if ((navigator as Navigator & { globalPrivacyControl?: boolean }).globalPrivacyControl === true) {
+        return
+      }
+
+      // Read, not obeyed: the answer is stored on the row so an operator can
+      // always tell which visits predate a visitor's consent and which follow
+      // it. `null` means they had not answered when this was recorded.
       const consent = consentChoice()
-      if (consent !== 'all') return
 
       done = true
 
@@ -140,13 +156,8 @@ export default function OfferVisitTracker({ specialOfferId }: Props) {
 
     run()
 
-    // If the visitor accepts after the page has loaded, honour it without a
-    // reload. Unsubscribed on unmount, so a navigation cannot leave it armed.
-    const unsubscribe = onConsentChange(run)
-
     return () => {
       cancelled = true
-      unsubscribe()
     }
   }, [specialOfferId])
 
